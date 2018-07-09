@@ -22,6 +22,7 @@
 - (NSDictionary *)selectLastRowID;
 - (void)insertNewTask: (Task*) task;
 - (void)deleteTask: (Task*) task;
-
+- (void)swapTaskID: (int) id1 toTaskID: (int) id2;
+- (void)updateTask: (Task*) task;
 
 @end

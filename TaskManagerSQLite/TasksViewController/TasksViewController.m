@@ -59,13 +59,41 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
     // Dispose of any resources that can be recreated.
 }
 
+- (IBAction)longPressRecognized:(UILongPressGestureRecognizer *)sender {
+    if (!self.tableView.isEditing) {
+        [self.tableView setEditing: YES animated: YES];
+    }
+}
+
+- (IBAction)rightSwipeRecognized:(UISwipeGestureRecognizer *)sender {
+    if (self.tableView.isEditing) {
+        [self.tableView setEditing: NO animated: YES];
+    }
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"segueToAddTask"] && self.tableView.indexPathForSelectedRow != nil) {
+        AddTaskViewController *addTaskViewController = segue.destinationViewController;
+        addTaskViewController.task = self.dataSource[self.tableView.indexPathForSelectedRow.row];
+    }
+}
+
 - (IBAction) unwindSegue:(UIStoryboardSegue*) segue {
     if ([segue.identifier isEqualToString:@"unwindSegueToTasks"]) {
         
         AddTaskViewController *addTaskViewController = segue.sourceViewController;
         Task *newTask = addTaskViewController.task;
+        NSIndexPath *indexPath = self.tableView.indexPathForSelectedRow;
         
-        if (newTask != nil) {
+        if (newTask == nil) {
+            return;
+        }
+        
+        if (newTask.id) {
+            NSLog(@"Update");
+            [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+            [[SQLManager sharedManager] updateTask:newTask];
+        } else {
             [[SQLManager sharedManager] insertNewTask:newTask];
             
             NSDictionary *item = [[SQLManager sharedManager] selectLastRowID];
@@ -76,6 +104,7 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
             [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:(self.dataSource.count - 1) inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
         }
         
+        [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     }
 }
 
@@ -99,7 +128,7 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
 // MARK: - Table View Delegate methods
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    [self performSegueWithIdentifier:@"segueToAddTask" sender:self];
 }
 
 - (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView trailingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -118,6 +147,32 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
     delete.image = [UIImage imageNamed: @"trashImg"];
     
     return [UISwipeActionsConfiguration configurationWithActions:@[delete]];
+}
+
+- (BOOL)tableView:(UITableView *)tableView shouldIndentWhileEditingRowAtIndexPath:(NSIndexPath *)indexPath {
+    return NO;
+}
+
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (self.tableView.isEditing) {
+        return UITableViewCellEditingStyleNone;
+    } else {
+        return UITableViewCellEditingStyleDelete;
+    }
+}
+
+- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
+    [self.dataSource exchangeObjectAtIndex:sourceIndexPath.row withObjectAtIndex:destinationIndexPath.row];
+    
+    int id1 = self.dataSource[sourceIndexPath.row].id;
+    int id2 = self.dataSource[destinationIndexPath.row].id;
+    
+    self.dataSource[sourceIndexPath.row].id = id2;
+    self.dataSource[destinationIndexPath.row].id = id1;
+    
+    [[SQLManager sharedManager] swapTaskID:id1 toTaskID:-1];
+    [[SQLManager sharedManager] swapTaskID:id2 toTaskID:id1];
+    [[SQLManager sharedManager] swapTaskID:-1 toTaskID:id2];
 }
 
 @end

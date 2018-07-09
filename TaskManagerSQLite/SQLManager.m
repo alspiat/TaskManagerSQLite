@@ -120,5 +120,15 @@ static int oneRowCallback (void *_queryValues, int columnCount, char **values, c
     [self executeSQLQuery:sql withCallback:NULL context:NULL];
 }
 
+- (void)updateTask: (Task*) task {
+    NSString *sql = [NSString stringWithFormat:@"UPDATE task SET name = '%@', details = '%@', iconName = '%@', expirationDate = %f, isDone = %d WHERE id = %d", task.name, task.details, task.iconName, task.expirationDate.timeIntervalSince1970, task.isDone ? 1 : 0, task.id];
+    [self executeSQLQuery:sql withCallback:NULL context:NULL];
+}
+
+- (void)swapTaskID: (int) id1 toTaskID: (int) id2 {
+    NSString *sql = [NSString stringWithFormat:@"UPDATE task SET id = %d WHERE id = %d", id2, id1];
+    [self executeSQLQuery:sql withCallback:NULL context:NULL];
+}
+
 @end
 

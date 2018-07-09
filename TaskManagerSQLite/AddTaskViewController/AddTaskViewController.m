@@ -39,6 +39,12 @@ static NSString * const markCollectionViewCell = @"MarkCollectionViewCell";
     self.marksCollectionView.dataSource = self;
     self.marksCollectionView.delegate = self;
     
+    if (self.task != nil) {
+        self.nameTextField.text = self.task.name;
+        self.detailsTextView.text = self.task.details;
+        self.datePicker.date = self.task.expirationDate;
+    }
+    
     // Do any additional setup after loading the view.
 }
 
@@ -48,7 +54,10 @@ static NSString * const markCollectionViewCell = @"MarkCollectionViewCell";
 }
 
 - (IBAction)saveButtonTapped:(UIBarButtonItem *)sender {
-    _task = [[Task alloc] init];
+    
+    if (self.task == nil) {
+        _task = [[Task alloc] init];
+    }
     
     self.task.name = self.nameTextField.text;
     self.task.details = self.detailsTextView.text;
