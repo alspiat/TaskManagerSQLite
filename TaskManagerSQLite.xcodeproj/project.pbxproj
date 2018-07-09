@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AA1F2BDB20F36EE900D486ED /* MarkCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = AA1F2BDA20F36EE900D486ED /* MarkCollectionViewCell.m */; };
 		AA932BBE20F2A48000864C80 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AA932BBD20F2A48000864C80 /* AppDelegate.m */; };
 		AA932BC420F2A48000864C80 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA932BC220F2A48000864C80 /* Main.storyboard */; };
 		AA932BC620F2A48200864C80 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA932BC520F2A48200864C80 /* Assets.xcassets */; };
@@ -14,12 +15,15 @@
 		AA932BCC20F2A48200864C80 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = AA932BCB20F2A48200864C80 /* main.m */; };
 		AA932BD420F2A50400864C80 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AA932BD320F2A50400864C80 /* libsqlite3.tbd */; };
 		AA932BD720F2A82800864C80 /* Task.m in Sources */ = {isa = PBXBuildFile; fileRef = AA932BD620F2A82800864C80 /* Task.m */; };
+		AAC6176720F3879300F0DB2C /* SQLManager.m in Sources */ = {isa = PBXBuildFile; fileRef = AAC6176620F3879300F0DB2C /* SQLManager.m */; };
 		AAE6635A20F347C6001F521C /* AddTaskViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AAE6635920F347C6001F521C /* AddTaskViewController.m */; };
 		AAE6635D20F34805001F521C /* TasksViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AAE6635C20F34805001F521C /* TasksViewController.m */; };
 		AAE6636120F348C5001F521C /* TaskTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = AAE6636020F348C5001F521C /* TaskTableViewCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AA1F2BD920F36EE900D486ED /* MarkCollectionViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MarkCollectionViewCell.h; sourceTree = "<group>"; };
+		AA1F2BDA20F36EE900D486ED /* MarkCollectionViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MarkCollectionViewCell.m; sourceTree = "<group>"; };
 		AA932BB920F2A48000864C80 /* TaskManagerSQLite.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TaskManagerSQLite.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA932BBC20F2A48000864C80 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		AA932BBD20F2A48000864C80 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -31,6 +35,8 @@
 		AA932BD320F2A50400864C80 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		AA932BD520F2A82800864C80 /* Task.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Task.h; sourceTree = "<group>"; };
 		AA932BD620F2A82800864C80 /* Task.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Task.m; sourceTree = "<group>"; };
+		AAC6176520F3879300F0DB2C /* SQLManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SQLManager.h; sourceTree = "<group>"; };
+		AAC6176620F3879300F0DB2C /* SQLManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SQLManager.m; sourceTree = "<group>"; };
 		AAE6635820F347C6001F521C /* AddTaskViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AddTaskViewController.h; sourceTree = "<group>"; };
 		AAE6635920F347C6001F521C /* AddTaskViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AddTaskViewController.m; sourceTree = "<group>"; };
 		AAE6635B20F34805001F521C /* TasksViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TasksViewController.h; sourceTree = "<group>"; };
@@ -51,6 +57,28 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AA1F2BD720F36E7600D486ED /* AddTaskViewController */ = {
+			isa = PBXGroup;
+			children = (
+				AAE6635820F347C6001F521C /* AddTaskViewController.h */,
+				AAE6635920F347C6001F521C /* AddTaskViewController.m */,
+				AA1F2BD920F36EE900D486ED /* MarkCollectionViewCell.h */,
+				AA1F2BDA20F36EE900D486ED /* MarkCollectionViewCell.m */,
+			);
+			path = AddTaskViewController;
+			sourceTree = "<group>";
+		};
+		AA1F2BD820F36E8200D486ED /* TasksViewController */ = {
+			isa = PBXGroup;
+			children = (
+				AAE6635B20F34805001F521C /* TasksViewController.h */,
+				AAE6635C20F34805001F521C /* TasksViewController.m */,
+				AAE6635F20F348C5001F521C /* TaskTableViewCell.h */,
+				AAE6636020F348C5001F521C /* TaskTableViewCell.m */,
+			);
+			path = TasksViewController;
+			sourceTree = "<group>";
+		};
 		AA932BB020F2A48000864C80 = {
 			isa = PBXGroup;
 			children = (
@@ -77,12 +105,13 @@
 				AA932BCB20F2A48200864C80 /* main.m */,
 				AA932BD520F2A82800864C80 /* Task.h */,
 				AA932BD620F2A82800864C80 /* Task.m */,
-				AAE6635E20F348A6001F521C /* View Controllers */,
-				AAE6635F20F348C5001F521C /* TaskTableViewCell.h */,
-				AAE6636020F348C5001F521C /* TaskTableViewCell.m */,
+				AA1F2BD820F36E8200D486ED /* TasksViewController */,
+				AA1F2BD720F36E7600D486ED /* AddTaskViewController */,
 				AA932BC520F2A48200864C80 /* Assets.xcassets */,
 				AA932BC720F2A48200864C80 /* LaunchScreen.storyboard */,
 				AA932BCA20F2A48200864C80 /* Info.plist */,
+				AAC6176520F3879300F0DB2C /* SQLManager.h */,
+				AAC6176620F3879300F0DB2C /* SQLManager.m */,
 			);
 			path = TaskManagerSQLite;
 			sourceTree = "<group>";
@@ -93,17 +122,6 @@
 				AA932BD320F2A50400864C80 /* libsqlite3.tbd */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		AAE6635E20F348A6001F521C /* View Controllers */ = {
-			isa = PBXGroup;
-			children = (
-				AAE6635820F347C6001F521C /* AddTaskViewController.h */,
-				AAE6635920F347C6001F521C /* AddTaskViewController.m */,
-				AAE6635B20F34805001F521C /* TasksViewController.h */,
-				AAE6635C20F34805001F521C /* TasksViewController.m */,
-			);
-			path = "View Controllers";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -180,8 +198,10 @@
 				AAE6635D20F34805001F521C /* TasksViewController.m in Sources */,
 				AAE6636120F348C5001F521C /* TaskTableViewCell.m in Sources */,
 				AA932BD720F2A82800864C80 /* Task.m in Sources */,
+				AA1F2BDB20F36EE900D486ED /* MarkCollectionViewCell.m in Sources */,
 				AA932BCC20F2A48200864C80 /* main.m in Sources */,
 				AA932BBE20F2A48000864C80 /* AppDelegate.m in Sources */,
+				AAC6176720F3879300F0DB2C /* SQLManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

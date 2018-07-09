@@ -18,11 +18,6 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     
-    // Sets background to a blank/empty image
-    [UINavigationBar.appearance setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
-    // Sets shadow (line below the bar) to a blank image
-    UINavigationBar.appearance.shadowImage = [[UIImage alloc] init];
-    
     return YES;
 }
 
