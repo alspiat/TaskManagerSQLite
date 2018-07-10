@@ -89,7 +89,7 @@
                         <viewLayoutGuide key="safeArea" id="Sgo-tC-qiV"/>
                     </view>
                     <navigationItem key="navigationItem" title="Tasks" id="Ldl-MX-lbV">
-                        <barButtonItem key="leftBarButtonItem" systemItem="organize" id="Gxj-Z4-tma">
+                        <barButtonItem key="leftBarButtonItem" systemItem="refresh" id="Gxj-Z4-tma">
                             <color key="tintColor" red="0.26051741839999998" green="0.2605243921" blue="0.260520637" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="sortButtonTapped:" destination="0bu-Ss-vsN" id="QEM-cX-Enn"/>
