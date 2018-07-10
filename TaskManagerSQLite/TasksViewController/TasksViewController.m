@@ -9,6 +9,7 @@
 #import "TasksViewController.h"
 #import "TaskTableViewCell.h"
 #import "AddTaskViewController.h"
+#import "AddTaskTableViewController.h"
 #import "SQLManager.h"
 
 static NSString * const taskCellIdentifier = @"TaskTableViewCell";
@@ -79,18 +80,27 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
     [self.tableView reloadData];
 }
 
+- (IBAction)addButtonTapped:(UIBarButtonItem *)sender {
+    
+    AddTaskTableViewController *addTaskTVC = [[AddTaskTableViewController alloc] init];
+    [self.navigationController pushViewController:addTaskTVC animated:YES];
+    //[self presentViewController:navVC animated:YES completion:nil];
+}
+
+
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"segueToAddTask"] && self.tableView.indexPathForSelectedRow != nil) {
-        AddTaskViewController *addTaskViewController = segue.destinationViewController;
-        addTaskViewController.task = self.dataSource[self.tableView.indexPathForSelectedRow.row];
+        UINavigationController *addTaskNavigationController = segue.destinationViewController;
+        AddTaskTableViewController *addTaskTableViewController = addTaskNavigationController.viewControllers[0];
+        addTaskTableViewController.task = self.dataSource[self.tableView.indexPathForSelectedRow.row];
     }
 }
 
 - (IBAction) unwindSegue:(UIStoryboardSegue*) segue {
     if ([segue.identifier isEqualToString:@"unwindSegueToTasks"]) {
         
-        AddTaskViewController *addTaskViewController = segue.sourceViewController;
-        Task *newTask = addTaskViewController.task;
+        AddTaskTableViewController *addTaskTableViewController = segue.sourceViewController;
+        Task *newTask = addTaskTableViewController.task;
         NSIndexPath *indexPath = self.tableView.indexPathForSelectedRow;
         
         if (newTask == nil) {
@@ -168,7 +178,7 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
         completionHandler(YES);
     }];
     
-    selectAsDone.backgroundColor = [UIColor colorWithRed:70.0/255.0 green:211.0/255.0 blue:73.0/255.0 alpha:1];
+    selectAsDone.backgroundColor = [UIColor colorWithRed:32.0/255.0 green:161.0/255.0 blue:63.0/255.0 alpha:1];
     selectAsDone.image = [UIImage imageNamed: @"checkedImg"];
     
     return [UISwipeActionsConfiguration configurationWithActions:@[selectAsDone]];

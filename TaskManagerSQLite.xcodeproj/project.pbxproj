@@ -15,6 +15,7 @@
 		AA932BCC20F2A48200864C80 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = AA932BCB20F2A48200864C80 /* main.m */; };
 		AA932BD420F2A50400864C80 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AA932BD320F2A50400864C80 /* libsqlite3.tbd */; };
 		AA932BD720F2A82800864C80 /* Task.m in Sources */ = {isa = PBXBuildFile; fileRef = AA932BD620F2A82800864C80 /* Task.m */; };
+		AAB4B1E320F53BD3006FCC0B /* AddTaskTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AAB4B1E220F53BD3006FCC0B /* AddTaskTableViewController.m */; };
 		AAC6176720F3879300F0DB2C /* SQLManager.m in Sources */ = {isa = PBXBuildFile; fileRef = AAC6176620F3879300F0DB2C /* SQLManager.m */; };
 		AAE6635A20F347C6001F521C /* AddTaskViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AAE6635920F347C6001F521C /* AddTaskViewController.m */; };
 		AAE6635D20F34805001F521C /* TasksViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AAE6635C20F34805001F521C /* TasksViewController.m */; };
@@ -35,6 +36,8 @@
 		AA932BD320F2A50400864C80 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		AA932BD520F2A82800864C80 /* Task.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Task.h; sourceTree = "<group>"; };
 		AA932BD620F2A82800864C80 /* Task.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Task.m; sourceTree = "<group>"; };
+		AAB4B1E120F53BD3006FCC0B /* AddTaskTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AddTaskTableViewController.h; sourceTree = "<group>"; };
+		AAB4B1E220F53BD3006FCC0B /* AddTaskTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AddTaskTableViewController.m; sourceTree = "<group>"; };
 		AAC6176520F3879300F0DB2C /* SQLManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SQLManager.h; sourceTree = "<group>"; };
 		AAC6176620F3879300F0DB2C /* SQLManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SQLManager.m; sourceTree = "<group>"; };
 		AAE6635820F347C6001F521C /* AddTaskViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AddTaskViewController.h; sourceTree = "<group>"; };
@@ -112,6 +115,8 @@
 				AA932BCA20F2A48200864C80 /* Info.plist */,
 				AAC6176520F3879300F0DB2C /* SQLManager.h */,
 				AAC6176620F3879300F0DB2C /* SQLManager.m */,
+				AAB4B1E120F53BD3006FCC0B /* AddTaskTableViewController.h */,
+				AAB4B1E220F53BD3006FCC0B /* AddTaskTableViewController.m */,
 			);
 			path = TaskManagerSQLite;
 			sourceTree = "<group>";
@@ -200,6 +205,7 @@
 				AA932BD720F2A82800864C80 /* Task.m in Sources */,
 				AA1F2BDB20F36EE900D486ED /* IconCollectionViewCell.m in Sources */,
 				AA932BCC20F2A48200864C80 /* main.m in Sources */,
+				AAB4B1E320F53BD3006FCC0B /* AddTaskTableViewController.m in Sources */,
 				AA932BBE20F2A48000864C80 /* AppDelegate.m in Sources */,
 				AAC6176720F3879300F0DB2C /* SQLManager.m in Sources */,
 			);

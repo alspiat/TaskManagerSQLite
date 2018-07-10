@@ -23,7 +23,7 @@
 
 - (void)prepareForReuse {
     [super prepareForReuse];
-    self.backgroundColor = UIColor.whiteColor;
+    self.backgroundColor = UIColor.clearColor;
 }
 
 - (void)configureCellWithTask:(Task *)task {
@@ -38,9 +38,9 @@
                                                           toDate:task.expirationDate
                                                          options:0];
     if (task.isDone) {
-        self.backgroundColor = [UIColor colorWithRed:0 green:250.0/255.0 blue:146.0/255.0 alpha:1];
+        self.backgroundColor = [UIColor colorWithRed:0 green:203.0/255.0 blue:123.0/255.0 alpha:1];
     } else if (components.day < 7) {
-        self.backgroundColor = [UIColor colorWithRed:1.0 green:126.0/255.0 blue:121.0/255.0 alpha:1];
+        self.backgroundColor = [UIColor colorWithRed:224.0/255.0 green:110.0/255.0 blue:109.0/255.0 alpha:1];
     }
     
 }
