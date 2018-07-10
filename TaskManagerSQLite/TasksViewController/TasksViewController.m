@@ -40,9 +40,10 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
             Task *task = [[Task alloc] init];
             
             task.id = ((NSString*)taskItem[@"id"]).intValue;
-            task.name = taskItem[@"name"];
+            task.title = taskItem[@"title"];
             task.details = taskItem[@"details"];
             task.iconName = taskItem[@"iconName"];
+            task.isDone = ((NSString*)taskItem[@"isDone"]).boolValue;
             task.expirationDate = [NSDate dateWithTimeIntervalSince1970:((NSString*)taskItem[@"expirationDate"]).doubleValue];
             
             [self.dataSource addObject:task];
@@ -69,6 +70,13 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
     if (self.tableView.isEditing) {
         [self.tableView setEditing: NO animated: YES];
     }
+}
+
+- (IBAction)sortButtonTapped:(UIBarButtonItem *)sender {
+    [self.dataSource sortUsingComparator:^NSComparisonResult(Task *task1, Task *task2) {
+        return [task1.expirationDate compare:task2.expirationDate];
+    }];
+    [self.tableView reloadData];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
@@ -147,6 +155,23 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
     delete.image = [UIImage imageNamed: @"trashImg"];
     
     return [UISwipeActionsConfiguration configurationWithActions:@[delete]];
+}
+
+- (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView leadingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UIContextualAction *selectAsDone = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal title:@"Done" handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
+        
+        self.dataSource[indexPath.row].isDone = YES;
+        [[SQLManager sharedManager] updateTask:self.dataSource[indexPath.row]];
+        
+        [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        
+        completionHandler(YES);
+    }];
+    
+    selectAsDone.backgroundColor = [UIColor colorWithRed:70.0/255.0 green:211.0/255.0 blue:73.0/255.0 alpha:1];
+    selectAsDone.image = [UIImage imageNamed: @"checkedImg"];
+    
+    return [UISwipeActionsConfiguration configurationWithActions:@[selectAsDone]];
 }
 
 - (BOOL)tableView:(UITableView *)tableView shouldIndentWhileEditingRowAtIndexPath:(NSIndexPath *)indexPath {

@@ -12,7 +12,7 @@
 
 @property (nonatomic, assign) int id;
 @property (nonatomic, copy) NSString *iconName;
-@property (nonatomic, copy) NSString *name;
+@property (nonatomic, copy) NSString *title;
 @property (nonatomic, copy) NSString *details;
 @property (nonatomic, assign) BOOL isDone;
 @property (nonatomic, copy) NSDate *expirationDate;

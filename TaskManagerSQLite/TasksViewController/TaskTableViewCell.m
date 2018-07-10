@@ -31,14 +31,16 @@
     [self.iconImageView.layer setCornerRadius:self.iconImageView.bounds.size.height * 0.5];
     self.iconImageView.layer.masksToBounds = YES;
     
-    self.nameLabel.text = task.name;
+    self.titleLabel.text = task.title;
     self.dateLabel.text = [NSDateFormatter localizedStringFromDate:task.expirationDate dateStyle:NSDateFormatterMediumStyle timeStyle:NSDateFormatterNoStyle];
     NSDateComponents *components = [NSCalendar.currentCalendar components:NSCalendarUnitDay
                                                         fromDate:NSDate.date
                                                           toDate:task.expirationDate
                                                          options:0];
-    if (components.day < 7) {
-        self.backgroundColor = [UIColor colorWithRed:1.0 green:127.0/255.0 blue:122.0/255.0 alpha:0.5];
+    if (task.isDone) {
+        self.backgroundColor = [UIColor colorWithRed:0 green:250.0/255.0 blue:146.0/255.0 alpha:1];
+    } else if (components.day < 7) {
+        self.backgroundColor = [UIColor colorWithRed:1.0 green:126.0/255.0 blue:121.0/255.0 alpha:1];
     }
     
 }

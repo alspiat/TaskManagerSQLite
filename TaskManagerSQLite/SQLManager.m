@@ -30,17 +30,17 @@ static sqlite3 *database = nil;
     // Build the path to the database file
     databasePath = [[NSString alloc] initWithString:
                     [docsDir stringByAppendingPathComponent: @"tasksData.db"]];
-    NSLog(databasePath);
+    NSLog(@"DB path: %@", databasePath);
     BOOL isSuccess = YES;
     NSFileManager *filemgr = [NSFileManager defaultManager];
     if ([filemgr fileExistsAtPath: databasePath ] == NO) {
         const char *dbpath = [databasePath UTF8String];
         if (sqlite3_open(dbpath, &database) == SQLITE_OK) {
-            char *errMsg;
+            char *errorMsg;
             const char *sql_stmt =
-            "CREATE TABLE IF NOT EXISTS task (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE, name TEXT, details TEXT, iconName TEXT, expirationDate DATE, isDone BOOL DEFAULT NO)";
+            "CREATE TABLE IF NOT EXISTS task (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE, title TEXT NOT NULL, details TEXT, iconName TEXT NOT NULL, expirationDate DATE NOT NULL, isDone BOOL DEFAULT NO)";
             
-            if (sqlite3_exec(database, sql_stmt, NULL, NULL, &errMsg) != SQLITE_OK) {
+            if (sqlite3_exec(database, sql_stmt, NULL, NULL, &errorMsg) != SQLITE_OK) {
                 isSuccess = NO;
                 NSLog(@"Failed to create table");
             }
@@ -111,7 +111,7 @@ static int oneRowCallback (void *_queryValues, int columnCount, char **values, c
 }
 
 - (void)insertNewTask: (Task*) task {
-    NSString *sql = [NSString stringWithFormat:@"INSERT INTO task (name, details, iconName, expirationDate, isDone) VALUES ('%@', '%@', '%@', %f, %d)", task.name, task.details, task.iconName, task.expirationDate.timeIntervalSince1970, task.isDone ? 1 : 0];
+    NSString *sql = [NSString stringWithFormat:@"INSERT INTO task (title, details, iconName, expirationDate, isDone) VALUES ('%@', '%@', '%@', %f, %d)", task.title, task.details, task.iconName, task.expirationDate.timeIntervalSince1970, task.isDone ? 1 : 0];
     [self executeSQLQuery:sql withCallback:NULL context:NULL];
 }
 
@@ -121,7 +121,7 @@ static int oneRowCallback (void *_queryValues, int columnCount, char **values, c
 }
 
 - (void)updateTask: (Task*) task {
-    NSString *sql = [NSString stringWithFormat:@"UPDATE task SET name = '%@', details = '%@', iconName = '%@', expirationDate = %f, isDone = %d WHERE id = %d", task.name, task.details, task.iconName, task.expirationDate.timeIntervalSince1970, task.isDone ? 1 : 0, task.id];
+    NSString *sql = [NSString stringWithFormat:@"UPDATE task SET title = '%@', details = '%@', iconName = '%@', expirationDate = %f, isDone = %d WHERE id = %d", task.title, task.details, task.iconName, task.expirationDate.timeIntervalSince1970, task.isDone ? 1 : 0, task.id];
     [self executeSQLQuery:sql withCallback:NULL context:NULL];
 }
 

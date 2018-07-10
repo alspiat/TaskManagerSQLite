@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AA1F2BDB20F36EE900D486ED /* MarkCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = AA1F2BDA20F36EE900D486ED /* MarkCollectionViewCell.m */; };
+		AA1F2BDB20F36EE900D486ED /* IconCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = AA1F2BDA20F36EE900D486ED /* IconCollectionViewCell.m */; };
 		AA932BBE20F2A48000864C80 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AA932BBD20F2A48000864C80 /* AppDelegate.m */; };
 		AA932BC420F2A48000864C80 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA932BC220F2A48000864C80 /* Main.storyboard */; };
 		AA932BC620F2A48200864C80 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA932BC520F2A48200864C80 /* Assets.xcassets */; };
@@ -22,8 +22,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		AA1F2BD920F36EE900D486ED /* MarkCollectionViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MarkCollectionViewCell.h; sourceTree = "<group>"; };
-		AA1F2BDA20F36EE900D486ED /* MarkCollectionViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MarkCollectionViewCell.m; sourceTree = "<group>"; };
+		AA1F2BD920F36EE900D486ED /* IconCollectionViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IconCollectionViewCell.h; sourceTree = "<group>"; };
+		AA1F2BDA20F36EE900D486ED /* IconCollectionViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IconCollectionViewCell.m; sourceTree = "<group>"; };
 		AA932BB920F2A48000864C80 /* TaskManagerSQLite.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TaskManagerSQLite.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA932BBC20F2A48000864C80 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		AA932BBD20F2A48000864C80 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -62,8 +62,8 @@
 			children = (
 				AAE6635820F347C6001F521C /* AddTaskViewController.h */,
 				AAE6635920F347C6001F521C /* AddTaskViewController.m */,
-				AA1F2BD920F36EE900D486ED /* MarkCollectionViewCell.h */,
-				AA1F2BDA20F36EE900D486ED /* MarkCollectionViewCell.m */,
+				AA1F2BD920F36EE900D486ED /* IconCollectionViewCell.h */,
+				AA1F2BDA20F36EE900D486ED /* IconCollectionViewCell.m */,
 			);
 			path = AddTaskViewController;
 			sourceTree = "<group>";
@@ -198,7 +198,7 @@
 				AAE6635D20F34805001F521C /* TasksViewController.m in Sources */,
 				AAE6636120F348C5001F521C /* TaskTableViewCell.m in Sources */,
 				AA932BD720F2A82800864C80 /* Task.m in Sources */,
-				AA1F2BDB20F36EE900D486ED /* MarkCollectionViewCell.m in Sources */,
+				AA1F2BDB20F36EE900D486ED /* IconCollectionViewCell.m in Sources */,
 				AA932BCC20F2A48200864C80 /* main.m in Sources */,
 				AA932BBE20F2A48000864C80 /* AppDelegate.m in Sources */,
 				AAC6176720F3879300F0DB2C /* SQLManager.m in Sources */,

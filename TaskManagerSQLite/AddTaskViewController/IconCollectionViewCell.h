@@ -1,5 +1,5 @@
 //
-//  MarkCollectionViewCell.h
+//  IconCollectionViewCell.h
 //  TaskManagerSQLite
 //
 //  Created by Алексей on 09.07.2018.
@@ -8,9 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface MarkCollectionViewCell : UICollectionViewCell
+@interface IconCollectionViewCell : UICollectionViewCell
 
-@property (weak, nonatomic) IBOutlet UIImageView *markImageView;
+@property (weak, nonatomic) IBOutlet UIImageView *iconImageView;
 
 - (void) configureWithImage: (UIImage*) image;
 
