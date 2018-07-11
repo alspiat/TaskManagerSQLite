@@ -23,10 +23,13 @@
 
 - (void)prepareForReuse {
     [super prepareForReuse];
-    self.backgroundColor = UIColor.clearColor;
 }
 
 - (void)configureCellWithTask:(Task *)task {
+    UIView *customColorView = [[UIView alloc] init];
+    customColorView.backgroundColor = [UIColor colorWithRed:82.0/255.0 green:89.0/255.0 blue:107.0/255.0 alpha:1.0];
+    self.selectedBackgroundView = customColorView;
+    
     self.iconImageView.image = [UIImage imageNamed:task.iconName];
     [self.iconImageView.layer setCornerRadius:self.iconImageView.bounds.size.height * 0.5];
     self.iconImageView.layer.masksToBounds = YES;
@@ -38,9 +41,13 @@
                                                           toDate:task.expirationDate
                                                          options:0];
     if (task.isDone) {
-        self.backgroundColor = [UIColor colorWithRed:0 green:203.0/255.0 blue:123.0/255.0 alpha:1];
+        [self.iconImageView.layer setBorderWidth:3.0];
+        [self.iconImageView.layer setBorderColor:[UIColor colorWithRed:37.0/255.0 green:225.0/255.0 blue:175.0/255.0 alpha:1].CGColor];
     } else if (components.day < 7) {
-        self.backgroundColor = [UIColor colorWithRed:224.0/255.0 green:110.0/255.0 blue:109.0/255.0 alpha:1];
+        [self.iconImageView.layer setBorderWidth:3.0];
+        [self.iconImageView.layer setBorderColor:[UIColor colorWithRed:249.0/255.0 green:83.0/255.0 blue:87.0/255.0 alpha:1].CGColor];
+    } else {
+        [self.iconImageView.layer setBorderWidth:0];
     }
     
 }

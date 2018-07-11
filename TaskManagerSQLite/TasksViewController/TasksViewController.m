@@ -8,13 +8,14 @@
 
 #import "TasksViewController.h"
 #import "TaskTableViewCell.h"
-#import "AddTaskViewController.h"
 #import "AddTaskTableViewController.h"
 #import "SQLManager.h"
 
 static NSString * const taskCellIdentifier = @"TaskTableViewCell";
 
-@interface TasksViewController () <UITableViewDataSource, UITableViewDelegate>
+@interface TasksViewController () <UITableViewDataSource, UITableViewDelegate> {
+    BOOL isSorted;
+}
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, nonatomic) NSMutableArray<Task*> *dataSource;
@@ -28,6 +29,8 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
     
     _dataSource = [[NSMutableArray alloc] init];
     
+    isSorted = NO;
+    
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
     
@@ -35,20 +38,7 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
     
     if ([[SQLManager sharedManager] initDatabase]) {
         NSLog(@"Success");
-        NSArray *values = [[SQLManager sharedManager] selectAllTasks];
-        
-        for (NSDictionary *taskItem in values) {
-            Task *task = [[Task alloc] init];
-            
-            task.id = ((NSString*)taskItem[@"id"]).intValue;
-            task.title = taskItem[@"title"];
-            task.details = taskItem[@"details"];
-            task.iconName = taskItem[@"iconName"];
-            task.isDone = ((NSString*)taskItem[@"isDone"]).boolValue;
-            task.expirationDate = [NSDate dateWithTimeIntervalSince1970:((NSString*)taskItem[@"expirationDate"]).doubleValue];
-            
-            [self.dataSource addObject:task];
-        }
+        [self fillDatasourceFromDatabase];
         
         [self.tableView reloadData];
     }
@@ -74,9 +64,17 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
 }
 
 - (IBAction)sortButtonTapped:(UIBarButtonItem *)sender {
-    [self.dataSource sortUsingComparator:^NSComparisonResult(Task *task1, Task *task2) {
-        return [task1.expirationDate compare:task2.expirationDate];
-    }];
+    if (!isSorted) {
+        [self.dataSource sortUsingComparator:^NSComparisonResult(Task *task1, Task *task2) {
+            return [task1.expirationDate compare:task2.expirationDate];
+        }];
+        
+        isSorted = YES;
+    } else {
+        [self fillDatasourceFromDatabase];
+        
+        isSorted = NO;
+    }
     [self.tableView reloadData];
 }
 
@@ -115,14 +113,40 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
             [[SQLManager sharedManager] insertNewTask:newTask];
             
             NSDictionary *item = [[SQLManager sharedManager] selectLastRowID];
-            int id = ((NSString *)item[@"id"]).intValue;
-            newTask.id = id;
             
-            [self.dataSource addObject:newTask];
-            [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:(self.dataSource.count - 1) inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
+            if (item != nil) {
+                int id = ((NSString *)item[@"id"]).intValue;
+                newTask.id = id;
+                
+                [self.dataSource addObject:newTask];
+                [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:(self.dataSource.count - 1) inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
+            }
         }
         
         [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+    }
+}
+
+- (void)fillDatasourceFromDatabase {
+    
+    [self.dataSource removeAllObjects];
+    NSArray *values = [[SQLManager sharedManager] selectAllTasks];
+    
+    if (values == nil) {
+        return;
+    }
+    
+    for (NSDictionary *taskItem in values) {
+        Task *task = [[Task alloc] init];
+        
+        task.id = ((NSString*)taskItem[@"id"]).intValue;
+        task.title = taskItem[@"title"];
+        task.details = taskItem[@"details"];
+        task.iconName = taskItem[@"iconName"];
+        task.isDone = ((NSString*)taskItem[@"isDone"]).boolValue;
+        task.expirationDate = [NSDate dateWithTimeIntervalSince1970:((NSString*)taskItem[@"expirationDate"]).doubleValue];
+        
+        [self.dataSource addObject:task];
     }
 }
 
@@ -151,7 +175,7 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
 
 - (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView trailingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    UIContextualAction *delete = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal title:@"Delete" handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
+    UIContextualAction *delete = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleDestructive title:@"Delete" handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
         
         [[SQLManager sharedManager] deleteTask:self.dataSource[indexPath.row]];
         [self.dataSource removeObjectAtIndex:indexPath.row];
@@ -162,15 +186,30 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
     }];
     
     delete.backgroundColor = [UIColor colorWithRed:211.0/255.0 green:70.0/255.0 blue:73.0/255.0 alpha:1];
-    delete.image = [UIImage imageNamed: @"trashImg"];
+    delete.image = [UIImage imageNamed: @"delete"];
     
     return [UISwipeActionsConfiguration configurationWithActions:@[delete]];
 }
 
 - (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView leadingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UIContextualAction *selectAsDone = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal title:@"Done" handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
+    
+    NSString *title;
+    NSString *imageName;
+    BOOL value;
+    
+    if (self.dataSource[indexPath.row].isDone) {
+        title = @"Undone";
+        imageName = @"undone";
+        value = NO;
+    } else {
+        title = @"Done";
+        imageName = @"done";
+        value = YES;
+    }
+    
+    UIContextualAction *selectAsDone = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal title:title handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
         
-        self.dataSource[indexPath.row].isDone = YES;
+        self.dataSource[indexPath.row].isDone = value;
         [[SQLManager sharedManager] updateTask:self.dataSource[indexPath.row]];
         
         [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
@@ -178,8 +217,8 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
         completionHandler(YES);
     }];
     
-    selectAsDone.backgroundColor = [UIColor colorWithRed:32.0/255.0 green:161.0/255.0 blue:63.0/255.0 alpha:1];
-    selectAsDone.image = [UIImage imageNamed: @"checkedImg"];
+    selectAsDone.backgroundColor = [UIColor colorWithRed:36.0/255.0 green:110.0/255.0 blue:95.0/255.0 alpha:1];
+    selectAsDone.image = [UIImage imageNamed: imageName];
     
     return [UISwipeActionsConfiguration configurationWithActions:@[selectAsDone]];
 }

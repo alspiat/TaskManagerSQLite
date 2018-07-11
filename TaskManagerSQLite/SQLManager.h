@@ -20,9 +20,10 @@
 
 - (NSArray *)selectAllTasks;
 - (NSDictionary *)selectLastRowID;
-- (void)insertNewTask: (Task*) task;
-- (void)deleteTask: (Task*) task;
-- (void)swapTaskID: (int) id1 toTaskID: (int) id2;
-- (void)updateTask: (Task*) task;
+
+- (BOOL)insertNewTask: (Task*) task;
+- (BOOL)deleteTask: (Task*) task;
+- (BOOL)swapTaskID: (int) id1 toTaskID: (int) id2;
+- (BOOL)updateTask: (Task*) task;
 
 @end

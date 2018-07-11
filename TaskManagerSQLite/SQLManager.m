@@ -73,61 +73,79 @@ static int oneRowCallback (void *_queryValues, int columnCount, char **values, c
     return 0;
 }
 
-- (void)executeSQLQuery: (NSString *) sql withCallback: (void *)callbackFunction context:(id)contextObject {
+- (BOOL)executeSQLQuery: (NSString *) sql withCallback: (void *)callbackFunction context:(id)contextObject {
     
     sqlite3 *db = NULL;
-    int rc = SQLITE_OK;
+    int resultCode = SQLITE_OK;
     char *errorMsg = NULL;
     
-    rc = sqlite3_open([databasePath UTF8String], &db);
-    if(SQLITE_OK != rc){
-        NSLog(@"Error: %s", sqlite3_errmsg(db));
+    resultCode = sqlite3_open([databasePath UTF8String], &db);
+    
+    if (resultCode != SQLITE_OK) {
+        NSLog(@"Error in opening database: %s", sqlite3_errmsg(db));
+        
         sqlite3_close(db);
+        
+        return NO;
     }
-    rc = sqlite3_exec(db, [sql UTF8String], callbackFunction, (__bridge void *)(contextObject), &errorMsg);
-    if (rc != SQLITE_OK) {
+    
+    resultCode = sqlite3_exec(db, [sql UTF8String], callbackFunction, (__bridge void *)(contextObject), &errorMsg);
+    
+    if (resultCode != SQLITE_OK) {
         NSLog(@"Error %@", sql);
         sqlite3_free(errorMsg);
+        
+        sqlite3_close(db);
+        
+        return NO;
     }
+    
     sqlite3_close(db);
+    
+    return YES;
 }
 
 - (NSArray *)selectAllTasks {
     NSString *sql = @"SELECT * FROM task";
     NSMutableArray *contextObject = [[NSMutableArray alloc] init];
     
-    [self executeSQLQuery:sql withCallback:multipleRowCallback context:contextObject];
+    if ([self executeSQLQuery:sql withCallback:multipleRowCallback context:contextObject]) {
+        return contextObject;
+    }
     
-    return contextObject;
+    return nil;
 }
 
 - (NSDictionary *)selectLastRowID {
     NSString *sql = @"SELECT MAX(id) AS id FROM task";
     NSMutableDictionary *contextObject = [[NSMutableDictionary alloc] init];
     
-    [self executeSQLQuery:sql withCallback:oneRowCallback context:contextObject];
+    if ([self executeSQLQuery:sql withCallback:oneRowCallback context:contextObject]) {
+        return contextObject;
+    }
     
-    return contextObject;
+    return nil;
 }
 
-- (void)insertNewTask: (Task*) task {
+- (BOOL)insertNewTask: (Task*) task {
     NSString *sql = [NSString stringWithFormat:@"INSERT INTO task (title, details, iconName, expirationDate, isDone) VALUES ('%@', '%@', '%@', %f, %d)", task.title, task.details, task.iconName, task.expirationDate.timeIntervalSince1970, task.isDone ? 1 : 0];
-    [self executeSQLQuery:sql withCallback:NULL context:NULL];
+    
+    return [self executeSQLQuery:sql withCallback:NULL context:NULL];
 }
 
-- (void)deleteTask: (Task*) task {
+- (BOOL)deleteTask: (Task*) task {
     NSString *sql = [NSString stringWithFormat:@"DELETE FROM task WHERE id = %d", task.id];
-    [self executeSQLQuery:sql withCallback:NULL context:NULL];
+     return [self executeSQLQuery:sql withCallback:NULL context:NULL];
 }
 
-- (void)updateTask: (Task*) task {
+- (BOOL)updateTask: (Task*) task {
     NSString *sql = [NSString stringWithFormat:@"UPDATE task SET title = '%@', details = '%@', iconName = '%@', expirationDate = %f, isDone = %d WHERE id = %d", task.title, task.details, task.iconName, task.expirationDate.timeIntervalSince1970, task.isDone ? 1 : 0, task.id];
-    [self executeSQLQuery:sql withCallback:NULL context:NULL];
+    return [self executeSQLQuery:sql withCallback:NULL context:NULL];
 }
 
-- (void)swapTaskID: (int) id1 toTaskID: (int) id2 {
+- (BOOL)swapTaskID: (int) id1 toTaskID: (int) id2 {
     NSString *sql = [NSString stringWithFormat:@"UPDATE task SET id = %d WHERE id = %d", id2, id1];
-    [self executeSQLQuery:sql withCallback:NULL context:NULL];
+    return [self executeSQLQuery:sql withCallback:NULL context:NULL];
 }
 
 @end
