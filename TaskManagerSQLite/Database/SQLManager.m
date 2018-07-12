@@ -7,49 +7,33 @@
 //
 
 #import "SQLManager.h"
-#import "Task.h"
+#import <sqlite3.h>
 
 static SQLManager *sharedInstance = nil;
-static sqlite3 *database = nil;
 
 @implementation SQLManager
 
 + (SQLManager*)sharedManager {
     if (!sharedInstance) {
         sharedInstance = [[self alloc] init];
+        [sharedInstance initDatabase];
     }
     return sharedInstance;
 }
 
 - (BOOL)initDatabase {
     
-    // Get the documents directory
     NSArray *dirPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *docsDir = dirPaths[0];
     
-    // Build the path to the database file
     databasePath = [[NSString alloc] initWithString:
                     [docsDir stringByAppendingPathComponent: @"tasksData.db"]];
     NSLog(@"DB path: %@", databasePath);
     BOOL isSuccess = YES;
     NSFileManager *filemgr = [NSFileManager defaultManager];
-    if ([filemgr fileExistsAtPath: databasePath ] == NO) {
-        const char *dbpath = [databasePath UTF8String];
-        if (sqlite3_open(dbpath, &database) == SQLITE_OK) {
-            char *errorMsg;
-            const char *sql_stmt =
-            "CREATE TABLE IF NOT EXISTS task (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE, title TEXT NOT NULL, details TEXT, iconName TEXT NOT NULL, expirationDate DATE NOT NULL, isDone BOOL DEFAULT NO)";
-            
-            if (sqlite3_exec(database, sql_stmt, NULL, NULL, &errorMsg) != SQLITE_OK) {
-                isSuccess = NO;
-                NSLog(@"Failed to create table");
-            }
-            sqlite3_close(database);
-            return  isSuccess;
-        } else {
-            isSuccess = NO;
-            NSLog(@"Failed to open/create database");
-        }
+    if ([filemgr fileExistsAtPath: databasePath] == NO) {
+        NSString *sql = @"CREATE TABLE IF NOT EXISTS task (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE, title TEXT NOT NULL, details TEXT, iconName TEXT NOT NULL, expirationDate DATE NOT NULL, isDone BOOL DEFAULT NO)";
+        return [self executeSQLQuery:sql withCallback:nil context:nil];
     }
     return isSuccess;
 }
@@ -83,7 +67,6 @@ static int oneRowCallback (void *_queryValues, int columnCount, char **values, c
     
     if (resultCode != SQLITE_OK) {
         NSLog(@"Error in opening database: %s", sqlite3_errmsg(db));
-        
         sqlite3_close(db);
         
         return NO;
@@ -94,57 +77,44 @@ static int oneRowCallback (void *_queryValues, int columnCount, char **values, c
     if (resultCode != SQLITE_OK) {
         NSLog(@"Error %@", sql);
         sqlite3_free(errorMsg);
-        
         sqlite3_close(db);
         
         return NO;
     }
-    
     sqlite3_close(db);
     
     return YES;
 }
 
-- (NSArray *)selectAllTasks {
-    NSString *sql = @"SELECT * FROM task";
+- (NSArray *)selectMultipleRows: (NSString*) sql {
     NSMutableArray *contextObject = [[NSMutableArray alloc] init];
     
     if ([self executeSQLQuery:sql withCallback:multipleRowCallback context:contextObject]) {
-        return contextObject;
+        return [contextObject copy];
     }
     
     return nil;
 }
 
-- (NSDictionary *)selectLastRowID {
-    NSString *sql = @"SELECT MAX(id) AS id FROM task";
+- (NSDictionary *)selectOneRow: (NSString*) sql {
     NSMutableDictionary *contextObject = [[NSMutableDictionary alloc] init];
     
     if ([self executeSQLQuery:sql withCallback:oneRowCallback context:contextObject]) {
-        return contextObject;
+        return [contextObject copy];
     }
     
     return nil;
 }
 
-- (BOOL)insertNewTask: (Task*) task {
-    NSString *sql = [NSString stringWithFormat:@"INSERT INTO task (title, details, iconName, expirationDate, isDone) VALUES ('%@', '%@', '%@', %f, %d)", task.title, task.details, task.iconName, task.expirationDate.timeIntervalSince1970, task.isDone ? 1 : 0];
-    
+- (BOOL)insertRow: (NSString*) sql {
     return [self executeSQLQuery:sql withCallback:NULL context:NULL];
 }
 
-- (BOOL)deleteTask: (Task*) task {
-    NSString *sql = [NSString stringWithFormat:@"DELETE FROM task WHERE id = %d", task.id];
-     return [self executeSQLQuery:sql withCallback:NULL context:NULL];
-}
-
-- (BOOL)updateTask: (Task*) task {
-    NSString *sql = [NSString stringWithFormat:@"UPDATE task SET title = '%@', details = '%@', iconName = '%@', expirationDate = %f, isDone = %d WHERE id = %d", task.title, task.details, task.iconName, task.expirationDate.timeIntervalSince1970, task.isDone ? 1 : 0, task.id];
+- (BOOL)deleteRow: (NSString*) sql {
     return [self executeSQLQuery:sql withCallback:NULL context:NULL];
 }
 
-- (BOOL)swapTaskID: (int) id1 toTaskID: (int) id2 {
-    NSString *sql = [NSString stringWithFormat:@"UPDATE task SET id = %d WHERE id = %d", id2, id1];
+- (BOOL)updateRow: (NSString*) sql {
     return [self executeSQLQuery:sql withCallback:NULL context:NULL];
 }
 

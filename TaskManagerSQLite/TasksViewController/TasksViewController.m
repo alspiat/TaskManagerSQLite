@@ -9,7 +9,8 @@
 #import "TasksViewController.h"
 #import "TaskTableViewCell.h"
 #import "AddTaskTableViewController.h"
-#import "SQLManager.h"
+#import "TaskDAO.h"
+#import "Task.h"
 
 static NSString * const taskCellIdentifier = @"TaskTableViewCell";
 
@@ -19,6 +20,7 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, nonatomic) NSMutableArray<Task*> *dataSource;
+@property (strong, nonatomic) TaskDAO *taskDAO;
 
 @end
 
@@ -27,7 +29,8 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    _dataSource = [[NSMutableArray alloc] init];
+    _taskDAO = [[TaskDAO alloc] init];
+    _dataSource = [NSMutableArray arrayWithArray:[self.taskDAO getAllTasks]];
     
     isSorted = NO;
     
@@ -35,13 +38,8 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
     self.tableView.delegate = self;
     
     [self.tableView setTableFooterView:[[UIView alloc] initWithFrame:CGRectZero]];
-    
-    if ([[SQLManager sharedManager] initDatabase]) {
-        NSLog(@"Success");
-        [self fillDatasourceFromDatabase];
         
-        [self.tableView reloadData];
-    }
+    [self.tableView reloadData];
     
     // Do any additional setup after loading the view.
 }
@@ -71,7 +69,7 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
         
         isSorted = YES;
     } else {
-        [self fillDatasourceFromDatabase];
+        self.dataSource = [NSMutableArray arrayWithArray:[self.taskDAO getAllTasks]];
         
         isSorted = NO;
     }
@@ -108,15 +106,13 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
         if (newTask.id) {
             NSLog(@"Update");
             [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-            [[SQLManager sharedManager] updateTask:newTask];
+            [self.taskDAO updateTask:newTask];
         } else {
-            [[SQLManager sharedManager] insertNewTask:newTask];
             
-            NSDictionary *item = [[SQLManager sharedManager] selectLastRowID];
+            int taskId = [self.taskDAO addTask:newTask];
             
-            if (item != nil) {
-                int id = ((NSString *)item[@"id"]).intValue;
-                newTask.id = id;
+            if (taskId != -1) {
+                newTask.id = taskId;
                 
                 [self.dataSource addObject:newTask];
                 [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:(self.dataSource.count - 1) inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
@@ -124,29 +120,6 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
         }
         
         [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-    }
-}
-
-- (void)fillDatasourceFromDatabase {
-    
-    [self.dataSource removeAllObjects];
-    NSArray *values = [[SQLManager sharedManager] selectAllTasks];
-    
-    if (values == nil) {
-        return;
-    }
-    
-    for (NSDictionary *taskItem in values) {
-        Task *task = [[Task alloc] init];
-        
-        task.id = ((NSString*)taskItem[@"id"]).intValue;
-        task.title = taskItem[@"title"];
-        task.details = taskItem[@"details"];
-        task.iconName = taskItem[@"iconName"];
-        task.isDone = ((NSString*)taskItem[@"isDone"]).boolValue;
-        task.expirationDate = [NSDate dateWithTimeIntervalSince1970:((NSString*)taskItem[@"expirationDate"]).doubleValue];
-        
-        [self.dataSource addObject:task];
     }
 }
 
@@ -177,7 +150,7 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
     
     UIContextualAction *delete = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleDestructive title:@"Delete" handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
         
-        [[SQLManager sharedManager] deleteTask:self.dataSource[indexPath.row]];
+        [self.taskDAO deleteTask:self.dataSource[indexPath.row]];
         [self.dataSource removeObjectAtIndex:indexPath.row];
         
         [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
@@ -210,7 +183,7 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
     UIContextualAction *selectAsDone = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal title:title handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
         
         self.dataSource[indexPath.row].isDone = value;
-        [[SQLManager sharedManager] updateTask:self.dataSource[indexPath.row]];
+        [self.taskDAO updateTask:self.dataSource[indexPath.row]];
         
         [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
         
@@ -244,9 +217,7 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
     self.dataSource[sourceIndexPath.row].id = id2;
     self.dataSource[destinationIndexPath.row].id = id1;
     
-    [[SQLManager sharedManager] swapTaskID:id1 toTaskID:-1];
-    [[SQLManager sharedManager] swapTaskID:id2 toTaskID:id1];
-    [[SQLManager sharedManager] swapTaskID:-1 toTaskID:id2];
+    [self.taskDAO swapTask:self.dataSource[sourceIndexPath.row] toTask:self.dataSource[destinationIndexPath.row]];
 }
 
 @end

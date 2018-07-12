@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "Task.h"
+
+@class Task;
 
 @interface TaskTableViewCell : UITableViewCell
 

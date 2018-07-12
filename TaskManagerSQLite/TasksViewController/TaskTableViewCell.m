@@ -7,6 +7,7 @@
 //
 
 #import "TaskTableViewCell.h"
+#import "Task.h"
 
 @implementation TaskTableViewCell
 

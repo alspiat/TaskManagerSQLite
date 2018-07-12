@@ -7,9 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <sqlite3.h>
-
-@class Task;
 
 @interface SQLManager : NSObject {
     NSString *databasePath;
@@ -18,12 +15,11 @@
 + (SQLManager*)sharedManager;
 - (BOOL)initDatabase;
 
-- (NSArray *)selectAllTasks;
-- (NSDictionary *)selectLastRowID;
+- (NSArray *)selectMultipleRows: (NSString*) sql;
+- (NSDictionary *)selectOneRow: (NSString*) sql;
 
-- (BOOL)insertNewTask: (Task*) task;
-- (BOOL)deleteTask: (Task*) task;
-- (BOOL)swapTaskID: (int) id1 toTaskID: (int) id2;
-- (BOOL)updateTask: (Task*) task;
+- (BOOL)insertRow: (NSString*) sql;
+- (BOOL)deleteRow: (NSString*) sql;
+- (BOOL)updateRow: (NSString*) sql;
 
 @end
