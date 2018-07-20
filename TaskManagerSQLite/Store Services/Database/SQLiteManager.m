@@ -1,27 +1,27 @@
 //
-//  DBManager.m
+//  SQLManager.m
 //  TaskManagerSQLite
 //
 //  Created by Алексей on 09.07.2018.
 //  Copyright © 2018 Алексей. All rights reserved.
 //
 
-#import "SQLManager.h"
+#import "SQLiteManager.h"
 #import <sqlite3.h>
 
-static SQLManager *sharedInstance = nil;
+static SQLiteManager *sharedInstance = nil;
 
-@implementation SQLManager
+@implementation SQLiteManager
 
-+ (SQLManager*)sharedManager {
++ (SQLiteManager*)sharedManager {
     if (!sharedInstance) {
         sharedInstance = [[self alloc] init];
-        [sharedInstance initDatabase];
+        [sharedInstance createDatabase];
     }
     return sharedInstance;
 }
 
-- (BOOL)initDatabase {
+- (void)createDatabase {
     
     NSArray *dirPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *docsDir = dirPaths[0];
@@ -29,14 +29,14 @@ static SQLManager *sharedInstance = nil;
     databasePath = [[NSString alloc] initWithString:
                     [docsDir stringByAppendingPathComponent: @"tasksData.db"]];
     NSLog(@"DB path: %@", databasePath);
-    BOOL isSuccess = YES;
     NSFileManager *filemgr = [NSFileManager defaultManager];
     if ([filemgr fileExistsAtPath: databasePath] == NO) {
-        NSString *sql = @"CREATE TABLE IF NOT EXISTS task (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE, title TEXT NOT NULL, details TEXT, iconName TEXT NOT NULL, expirationDate DATE NOT NULL, isDone BOOL DEFAULT NO)";
-        return [self executeSQLQuery:sql withCallback:nil context:nil];
+        NSString *sql = @"CREATE TABLE IF NOT EXISTS task (id INTEGER NOT NULL, title TEXT NOT NULL, details TEXT, iconName TEXT NOT NULL, expirationDate DATE NOT NULL, isDone BOOL DEFAULT NO)";
+        [self executeSQLQuery:sql withCallback:nil context:nil];
     }
-    return isSuccess;
 }
+
+// MARK: - Callback functions to sqlite exec
 
 static int multipleRowCallback (void *_queryValues, int columnCount, char **values, char **columnNames) {
     NSMutableArray *queryValues = (__bridge NSMutableArray *)_queryValues;
@@ -57,7 +57,9 @@ static int oneRowCallback (void *_queryValues, int columnCount, char **values, c
     return 0;
 }
 
-- (BOOL)executeSQLQuery: (NSString *) sql withCallback: (void *)callbackFunction context:(id)contextObject {
+// MARK: - CRUD methods
+
+- (void)executeSQLQuery: (NSString *) sql withCallback: (void *)callbackFunction context:(id)contextObject {
     
     sqlite3 *db = NULL;
     int resultCode = SQLITE_OK;
@@ -69,7 +71,7 @@ static int oneRowCallback (void *_queryValues, int columnCount, char **values, c
         NSLog(@"Error in opening database: %s", sqlite3_errmsg(db));
         sqlite3_close(db);
         
-        return NO;
+        return;
     }
     
     resultCode = sqlite3_exec(db, [sql UTF8String], callbackFunction, (__bridge void *)(contextObject), &errorMsg);
@@ -77,45 +79,34 @@ static int oneRowCallback (void *_queryValues, int columnCount, char **values, c
     if (resultCode != SQLITE_OK) {
         NSLog(@"Error %@", sql);
         sqlite3_free(errorMsg);
-        sqlite3_close(db);
-        
-        return NO;
     }
     sqlite3_close(db);
-    
-    return YES;
 }
 
 - (NSArray *)selectMultipleRows: (NSString*) sql {
     NSMutableArray *contextObject = [[NSMutableArray alloc] init];
     
-    if ([self executeSQLQuery:sql withCallback:multipleRowCallback context:contextObject]) {
-        return [contextObject copy];
-    }
-    
-    return nil;
+    [self executeSQLQuery:sql withCallback:multipleRowCallback context:contextObject];
+    return [contextObject copy];
 }
 
 - (NSDictionary *)selectOneRow: (NSString*) sql {
     NSMutableDictionary *contextObject = [[NSMutableDictionary alloc] init];
     
-    if ([self executeSQLQuery:sql withCallback:oneRowCallback context:contextObject]) {
-        return [contextObject copy];
-    }
-    
-    return nil;
+    [self executeSQLQuery:sql withCallback:oneRowCallback context:contextObject];
+    return [contextObject copy];
 }
 
-- (BOOL)insertRow: (NSString*) sql {
-    return [self executeSQLQuery:sql withCallback:NULL context:NULL];
+- (void)insertRow: (NSString*) sql {
+    [self executeSQLQuery:sql withCallback:NULL context:NULL];
 }
 
-- (BOOL)deleteRow: (NSString*) sql {
-    return [self executeSQLQuery:sql withCallback:NULL context:NULL];
+- (void)deleteRow: (NSString*) sql {
+    [self executeSQLQuery:sql withCallback:NULL context:NULL];
 }
 
-- (BOOL)updateRow: (NSString*) sql {
-    return [self executeSQLQuery:sql withCallback:NULL context:NULL];
+- (void)updateRow: (NSString*) sql {
+    [self executeSQLQuery:sql withCallback:NULL context:NULL];
 }
 
 @end

@@ -1,5 +1,5 @@
 //
-//  DBManager.h
+//  SQLManager.h
 //  TaskManagerSQLite
 //
 //  Created by Алексей on 09.07.2018.
@@ -8,18 +8,18 @@
 
 #import <Foundation/Foundation.h>
 
-@interface SQLManager : NSObject {
+@interface SQLiteManager : NSObject {
     NSString *databasePath;
 }
 
-+ (SQLManager*)sharedManager;
-- (BOOL)initDatabase;
++ (SQLiteManager*)sharedManager;
+- (void)createDatabase;
 
 - (NSArray *)selectMultipleRows: (NSString*) sql;
 - (NSDictionary *)selectOneRow: (NSString*) sql;
 
-- (BOOL)insertRow: (NSString*) sql;
-- (BOOL)deleteRow: (NSString*) sql;
-- (BOOL)updateRow: (NSString*) sql;
+- (void)insertRow: (NSString*) sql;
+- (void)deleteRow: (NSString*) sql;
+- (void)updateRow: (NSString*) sql;
 
 @end

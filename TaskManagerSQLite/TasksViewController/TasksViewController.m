@@ -9,8 +9,9 @@
 #import "TasksViewController.h"
 #import "TaskTableViewCell.h"
 #import "AddTaskTableViewController.h"
-#import "TaskDAO.h"
 #import "Task.h"
+#import "TaskServiceProvider.h"
+#import "StoreType.h"
 
 static NSString * const taskCellIdentifier = @"TaskTableViewCell";
 
@@ -19,8 +20,11 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
 }
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (strong, nonatomic) NSMutableArray<Task*> *dataSource;
-@property (strong, nonatomic) TaskDAO *taskDAO;
+
+@property (strong, nonatomic) NSMutableArray<Task *> *dataSource;
+@property (strong, nonatomic) id<TaskServiceProtocol> taskService;
+
+@property (assign, nonatomic) StoreType currentStoreType;
 
 @end
 
@@ -29,19 +33,42 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    _taskDAO = [[TaskDAO alloc] init];
-    _dataSource = [NSMutableArray arrayWithArray:[self.taskDAO getAllTasks]];
-    
     isSorted = NO;
     
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
     
+    _dataSource = [[NSMutableArray alloc] init];
+    
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    self.currentStoreType = [userDefaults integerForKey:SettingsStoreType];
+    
+    NSLog(@"Load storeType: %@", self.currentStoreType == StoreTypeCoreData ? @"StoreTypeCoreData" : @"StoreTypeSQLite");
+    
+    [TaskServiceProvider.sharedProvider setStoreType:self.currentStoreType];
+    self.taskService = [TaskServiceProvider.sharedProvider getCurrentService];
+    
+    [self.dataSource addObjectsFromArray:[self.taskService getAllTasks]];
+    
     [self.tableView setTableFooterView:[[UIView alloc] initWithFrame:CGRectZero]];
-        
-    [self.tableView reloadData];
     
     // Do any additional setup after loading the view.
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    if (TaskServiceProvider.sharedProvider.storeType != self.currentStoreType) {
+        NSLog(@"Update storeType to %@", TaskServiceProvider.sharedProvider.storeType == StoreTypeCoreData ? @"StoreTypeCoreData" : @"StoreTypeSQLite");
+        
+        self.currentStoreType = TaskServiceProvider.sharedProvider.storeType;
+        self.taskService = [TaskServiceProvider.sharedProvider getCurrentService];
+        
+        [self.dataSource removeAllObjects];
+        [self.dataSource addObjectsFromArray:[self.taskService getAllTasks]];
+        
+        [self.tableView reloadData];
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -49,38 +76,19 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
     // Dispose of any resources that can be recreated.
 }
 
-- (IBAction)longPressRecognized:(UILongPressGestureRecognizer *)sender {
-    if (!self.tableView.isEditing) {
-        [self.tableView setEditing: YES animated: YES];
-    }
-}
-
-- (IBAction)rightSwipeRecognized:(UISwipeGestureRecognizer *)sender {
-    if (self.tableView.isEditing) {
-        [self.tableView setEditing: NO animated: YES];
-    }
-}
-
 - (IBAction)sortButtonTapped:(UIBarButtonItem *)sender {
     if (!isSorted) {
         [self.dataSource sortUsingComparator:^NSComparisonResult(Task *task1, Task *task2) {
             return [task1.expirationDate compare:task2.expirationDate];
         }];
-        
+
         isSorted = YES;
     } else {
-        self.dataSource = [NSMutableArray arrayWithArray:[self.taskDAO getAllTasks]];
-        
+        self.dataSource = [NSMutableArray arrayWithArray:[self.taskService getAllTasks]];
+
         isSorted = NO;
     }
     [self.tableView reloadData];
-}
-
-- (IBAction)addButtonTapped:(UIBarButtonItem *)sender {
-    
-    AddTaskTableViewController *addTaskTVC = [[AddTaskTableViewController alloc] init];
-    [self.navigationController pushViewController:addTaskTVC animated:YES];
-    //[self presentViewController:navVC animated:YES completion:nil];
 }
 
 
@@ -92,7 +100,7 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
     }
 }
 
-- (IBAction) unwindSegue:(UIStoryboardSegue*) segue {
+- (IBAction)unwindSegue:(UIStoryboardSegue*) segue {
     if ([segue.identifier isEqualToString:@"unwindSegueToTasks"]) {
         
         AddTaskTableViewController *addTaskTableViewController = segue.sourceViewController;
@@ -104,19 +112,15 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
         }
         
         if (newTask.id) {
-            NSLog(@"Update");
+            //NSLog(@"Update");
+            [self.taskService updateTask:newTask];
             [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-            [self.taskDAO updateTask:newTask];
         } else {
-            
-            int taskId = [self.taskDAO addTask:newTask];
-            
-            if (taskId != -1) {
-                newTask.id = taskId;
-                
-                [self.dataSource addObject:newTask];
-                [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:(self.dataSource.count - 1) inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
-            }
+            //NSLog(@"New task");
+            newTask.id = [self.taskService getLastTaskID] + 1;
+            [self.taskService addTask:newTask];
+            [self.dataSource addObject:newTask];
+            [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:(self.dataSource.count - 1) inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
         }
         
         [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -150,7 +154,7 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
     
     UIContextualAction *delete = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleDestructive title:@"Delete" handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
         
-        [self.taskDAO deleteTask:self.dataSource[indexPath.row]];
+        [self.taskService deleteTask:self.dataSource[indexPath.row]];
         [self.dataSource removeObjectAtIndex:indexPath.row];
         
         [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
@@ -158,7 +162,7 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
         completionHandler(YES);
     }];
     
-    delete.backgroundColor = [UIColor colorWithRed:211.0/255.0 green:70.0/255.0 blue:73.0/255.0 alpha:1];
+    //delete.backgroundColor = [self.colorService colorForDeleteRowAction];
     delete.image = [UIImage imageNamed: @"delete"];
     
     return [UISwipeActionsConfiguration configurationWithActions:@[delete]];
@@ -183,7 +187,7 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
     UIContextualAction *selectAsDone = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal title:title handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
         
         self.dataSource[indexPath.row].isDone = value;
-        [self.taskDAO updateTask:self.dataSource[indexPath.row]];
+        [self.taskService updateTask:self.dataSource[indexPath.row]];
         
         [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
         
@@ -194,30 +198,6 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
     selectAsDone.image = [UIImage imageNamed: imageName];
     
     return [UISwipeActionsConfiguration configurationWithActions:@[selectAsDone]];
-}
-
-- (BOOL)tableView:(UITableView *)tableView shouldIndentWhileEditingRowAtIndexPath:(NSIndexPath *)indexPath {
-    return NO;
-}
-
-- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (self.tableView.isEditing) {
-        return UITableViewCellEditingStyleNone;
-    } else {
-        return UITableViewCellEditingStyleDelete;
-    }
-}
-
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
-    [self.dataSource exchangeObjectAtIndex:sourceIndexPath.row withObjectAtIndex:destinationIndexPath.row];
-    
-    int id1 = self.dataSource[sourceIndexPath.row].id;
-    int id2 = self.dataSource[destinationIndexPath.row].id;
-    
-    self.dataSource[sourceIndexPath.row].id = id2;
-    self.dataSource[destinationIndexPath.row].id = id1;
-    
-    [self.taskDAO swapTask:self.dataSource[sourceIndexPath.row] toTask:self.dataSource[destinationIndexPath.row]];
 }
 
 @end

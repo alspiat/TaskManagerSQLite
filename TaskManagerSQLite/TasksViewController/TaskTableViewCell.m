@@ -9,6 +9,14 @@
 #import "TaskTableViewCell.h"
 #import "Task.h"
 
+@interface TaskTableViewCell()
+
+@property (weak, nonatomic) IBOutlet UIImageView *iconImageView;
+@property (weak, nonatomic) IBOutlet UILabel *titleLabel;
+@property (weak, nonatomic) IBOutlet UILabel *dateLabel;
+
+@end
+
 @implementation TaskTableViewCell
 
 - (void)awakeFromNib {

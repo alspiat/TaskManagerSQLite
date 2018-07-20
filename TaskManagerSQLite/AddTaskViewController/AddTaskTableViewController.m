@@ -91,13 +91,9 @@ static NSString * const iconCollectionViewCell = @"IconCollectionViewCell";
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     IconCollectionViewCell *iconCell = [collectionView dequeueReusableCellWithReuseIdentifier:iconCollectionViewCell forIndexPath:indexPath];
-    [iconCell configureWithImage:[UIImage imageNamed:self.icons[indexPath.row]]];
     
-    if (indexPath == selectedIconIndex) {
-        [iconCell.iconImageView.layer setBorderWidth:3];
-    } else {
-        [iconCell.iconImageView.layer setBorderWidth:0];
-    }
+    [iconCell configureWithImage:[UIImage imageNamed:self.icons[indexPath.row]]];
+    [iconCell setIsSelected: (indexPath == selectedIconIndex)];
     
     return iconCell;
 }

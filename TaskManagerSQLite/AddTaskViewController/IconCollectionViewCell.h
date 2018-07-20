@@ -10,8 +10,7 @@
 
 @interface IconCollectionViewCell : UICollectionViewCell
 
-@property (weak, nonatomic) IBOutlet UIImageView *iconImageView;
-
 - (void) configureWithImage: (UIImage*) image;
+- (void) setIsSelected: (BOOL) isSelected;
 
 @end
