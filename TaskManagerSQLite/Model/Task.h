@@ -15,6 +15,6 @@
 @property (nonatomic, copy) NSString *title;
 @property (nonatomic, copy) NSString *details;
 @property (nonatomic, assign) BOOL isDone;
-@property (nonatomic, copy) NSDate *expirationDate;
+@property (nonatomic, strong) NSDate *expirationDate;
 
 @end
