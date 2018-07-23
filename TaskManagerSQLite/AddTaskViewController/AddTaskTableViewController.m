@@ -10,6 +10,9 @@
 #import "IconCollectionViewCell.h"
 #import "Task.h"
 #import "UIColor+ApplicationColors.h"
+#import "TaskServiceProtocol.h"
+#import "TaskServiceProvider.h"
+#import "Constants.h"
 
 @interface AddTaskTableViewController () <UICollectionViewDataSource, UICollectionViewDelegate> {
     NSIndexPath *selectedIconIndex;
@@ -19,6 +22,8 @@
 @property (weak, nonatomic) IBOutlet UITextView *detailsTextView;
 @property (weak, nonatomic) IBOutlet UIDatePicker *datePicker;
 @property (weak, nonatomic) IBOutlet UICollectionView *iconsCollectionView;
+
+@property (strong, nonatomic) id<TaskServiceProtocol> taskService;
 
 @property (strong, nonatomic) NSArray *icons;
 
@@ -32,6 +37,8 @@
     [self.tableView setTableFooterView:[[UIView alloc] initWithFrame:CGRectZero]];
     
     _icons = [[NSArray alloc] initWithObjects:@"ok", @"home", @"family", @"music", @"work", @"friends", @"shop", @"video", @"food", @"letter", nil];
+    self.taskService = [TaskServiceProvider.sharedProvider getCurrentService];
+    
     selectedIconIndex = [NSIndexPath indexPathForRow:0 inSection:0];
     
     self.iconsCollectionView.dataSource = self;
@@ -46,12 +53,15 @@
         self.datePicker.date = self.task.expirationDate;
         
         if (self.task.iconName) {
-            NSLog(@"IconName: %@", self.task.iconName);
             selectedIconIndex = [NSIndexPath indexPathForRow:[self.icons indexOfObject:self.task.iconName] inSection:0];
         }
     } else {
         self.datePicker.minimumDate = [NSDate date];
     }
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    self.taskService = [TaskServiceProvider.sharedProvider getCurrentService];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -63,17 +73,34 @@
     
     if (self.task == nil) {
         _task = [[Task alloc] init];
+        
+        self.task.id = [TaskServiceProvider.sharedProvider getMaxLastTaskID] + 1;
+        self.task.title = self.titleTextField.text;
+        self.task.details = self.detailsTextView.text;
+        self.task.expirationDate = self.datePicker.date;
+        
+        if (selectedIconIndex != nil) {
+            self.task.iconName = self.icons[selectedIconIndex.row];
+        }
+        
+        [self.taskService addTask:self.task];
+        [self.delegate saveNewTask:self.task];
+        
+    } else {
+        
+        self.task.title = self.titleTextField.text;
+        self.task.details = self.detailsTextView.text;
+        self.task.expirationDate = self.datePicker.date;
+        
+        if (selectedIconIndex != nil) {
+            self.task.iconName = self.icons[selectedIconIndex.row];
+        }
+        
+        [self.taskService updateTask:self.task];
+        [self.delegate updateTask:self.task];
     }
     
-    self.task.title = self.titleTextField.text;
-    self.task.details = self.detailsTextView.text;
-    self.task.expirationDate = self.datePicker.date;
-    
-    if (selectedIconIndex != nil) {
-        self.task.iconName = self.icons[selectedIconIndex.row];
-    }
-    
-    [self performSegueWithIdentifier:@"unwindSegueToTasks" sender:self];
+    [self performSegueWithIdentifier:unwindSegueToTasksController sender:self];
 }
 
 // MARK: - Table View DataSource methods

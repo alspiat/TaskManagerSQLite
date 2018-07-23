@@ -10,8 +10,18 @@
 
 @class Task;
 
+@protocol AddTaskViewControllerDelegate <NSObject>
+
+@required
+
+-(void)saveNewTask: (Task*) task;
+-(void)updateTask: (Task*) task;
+
+@end
+
 @interface AddTaskTableViewController : UITableViewController
 
 @property (strong, nonatomic) Task* task;
+@property (nonatomic, weak) id<AddTaskViewControllerDelegate> delegate;
 
 @end

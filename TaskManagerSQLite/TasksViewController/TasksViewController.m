@@ -15,7 +15,7 @@
 #import "StoreType.h"
 #import "Constants.h"
 
-@interface TasksViewController () <UITableViewDataSource, UITableViewDelegate> {
+@interface TasksViewController () <UITableViewDataSource, UITableViewDelegate, AddTaskViewControllerDelegate> {
     BOOL isSorted;
 }
 
@@ -23,8 +23,6 @@
 
 @property (strong, nonatomic) NSMutableArray<Task *> *dataSource;
 @property (strong, nonatomic) id<TaskServiceProtocol> taskService;
-
-@property (assign, nonatomic) StoreType currentStoreType;
 
 @end
 
@@ -41,9 +39,9 @@
     _dataSource = [[NSMutableArray alloc] init];
     
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    self.currentStoreType = [userDefaults integerForKey:SettingsStoreType];
+    StoreType storeType = [userDefaults integerForKey:SettingsStoreType];
     
-    [TaskServiceProvider.sharedProvider setStoreType:self.currentStoreType];
+    [TaskServiceProvider.sharedProvider setStoreType:storeType];
     self.taskService = [TaskServiceProvider.sharedProvider getCurrentService];
     
     [self.dataSource addObjectsFromArray:[self.taskService getAllTasks]];
@@ -56,8 +54,6 @@
 }
 
 - (void) updateTableView {
-    NSLog(@"Update");
-    self.currentStoreType = TaskServiceProvider.sharedProvider.storeType;
     self.taskService = [TaskServiceProvider.sharedProvider getCurrentService];
     
     [self.dataSource removeAllObjects];
@@ -88,41 +84,38 @@
 
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if ([segue.identifier isEqualToString:@"segueToAddTask"] && self.tableView.indexPathForSelectedRow != nil) {
+    if ([segue.identifier isEqualToString:segueToAddTaskController]) {
         UINavigationController *addTaskNavigationController = segue.destinationViewController;
         AddTaskTableViewController *addTaskTableViewController = addTaskNavigationController.viewControllers[0];
-        addTaskTableViewController.task = self.dataSource[self.tableView.indexPathForSelectedRow.row];
+        addTaskTableViewController.delegate = self;
+        
+        if (self.tableView.indexPathForSelectedRow != nil) {
+            addTaskTableViewController.task = self.dataSource[self.tableView.indexPathForSelectedRow.row];
+        }
+        
     }
 }
 
 - (IBAction)unwindSegue:(UIStoryboardSegue*) segue {
-    if ([segue.identifier isEqualToString:@"unwindSegueToTasks"]) {
-        
-        AddTaskTableViewController *addTaskTableViewController = segue.sourceViewController;
-        Task *newTask = addTaskTableViewController.task;
+    if ([segue.identifier isEqualToString:unwindSegueToTasksController]) {
         NSIndexPath *indexPath = self.tableView.indexPathForSelectedRow;
-        
-        if (newTask == nil) {
-            return;
-        }
-        
-        if (newTask.id) {
-            //NSLog(@"Update");
-            [self.taskService updateTask:newTask];
-            [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-        } else {
-            //NSLog(@"New task");
-            newTask.id = [TaskServiceProvider.sharedProvider getMaxLastTaskID] + 1;
-            [self.taskService addTask:newTask];
-            [self.dataSource addObject:newTask];
-            [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:(self.dataSource.count - 1) inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
-        }
-        
         [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     }
 }
 
-// MARK: - Table View DataSource methods
+// MARK: - AddTaskViewController delegate methods
+
+- (void)saveNewTask:(Task *)task {
+    [self.dataSource addObject:task];
+    [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:(self.dataSource.count - 1) inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
+}
+
+- (void)updateTask:(Task *)task {
+    NSIndexPath *indexPath = self.tableView.indexPathForSelectedRow;
+    [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+}
+
+// MARK: - Table View datasource methods
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
@@ -142,7 +135,7 @@
 // MARK: - Table View Delegate methods
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [self performSegueWithIdentifier:@"segueToAddTask" sender:self];
+    [self performSegueWithIdentifier:segueToAddTaskController sender:self];
 }
 
 - (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView trailingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -158,7 +151,7 @@
     }];
     
     delete.backgroundColor = [UIColor appDeleteRowActionColor];
-    delete.image = [UIImage imageNamed: @"delete"];
+    delete.image = [UIImage imageNamed: deleteImageName];
     
     return [UISwipeActionsConfiguration configurationWithActions:@[delete]];
 }
@@ -171,11 +164,11 @@
     
     if (self.dataSource[indexPath.row].isDone) {
         title = @"Undone";
-        imageName = @"undone";
+        imageName = undoneImageName;
         value = NO;
     } else {
         title = @"Done";
-        imageName = @"done";
+        imageName = doneImageName;
         value = YES;
     }
     

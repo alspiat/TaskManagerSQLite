@@ -14,4 +14,11 @@ static const CGFloat iconBorderWidthZero = 0.0;
 
 static const CGFloat iconCornerRadiusFactor = 0.5;
 
+static NSString * const segueToAddTaskController = @"segueToAddTask";
+static NSString * const unwindSegueToTasksController = @"unwindSegueToTasks";
+
+static NSString * const deleteImageName = @"delete";
+static NSString * const undoneImageName = @"undone";
+static NSString * const doneImageName = @"done";
+
 #endif /* Constants_h */

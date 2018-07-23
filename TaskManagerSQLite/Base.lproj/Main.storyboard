@@ -96,7 +96,6 @@
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="8o6-0B-EOF">
                             <color key="tintColor" red="0.70196078431372544" green="0.70196078431372544" blue="0.70196078431372544" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
-                                <action selector="addButtonTapped:" destination="0bu-Ss-vsN" id="kDn-gP-wl1"/>
                                 <segue destination="wz1-Xl-QjR" kind="presentation" identifier="segueToAddTask" id="jBX-fM-Idi"/>
                             </connections>
                         </barButtonItem>
