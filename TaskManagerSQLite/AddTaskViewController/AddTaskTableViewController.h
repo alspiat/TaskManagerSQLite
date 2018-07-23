@@ -14,7 +14,7 @@
 
 @required
 
--(void)saveNewTask: (Task*) task;
+-(void)addNewTask: (Task*) task;
 -(void)updateTask: (Task*) task;
 
 @end

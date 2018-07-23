@@ -84,7 +84,7 @@
         }
         
         [self.taskService addTask:self.task];
-        [self.delegate saveNewTask:self.task];
+        [self.delegate addNewTask:self.task];
         
     } else {
         

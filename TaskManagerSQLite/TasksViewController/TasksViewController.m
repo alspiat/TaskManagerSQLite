@@ -105,7 +105,7 @@
 
 // MARK: - AddTaskViewController delegate methods
 
-- (void)saveNewTask:(Task *)task {
+- (void)addNewTask:(Task *)task {
     [self.dataSource addObject:task];
     [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:(self.dataSource.count - 1) inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
 }
