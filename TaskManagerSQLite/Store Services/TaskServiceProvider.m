@@ -50,62 +50,72 @@ static TaskServiceProvider *sharedService = nil;
     }
 }
 
+- (void)synchronizeAdditionFromService: (id<TaskServiceProtocol>) modifiedService withService: (id<TaskServiceProtocol>) updatableService {
+    
+    [modifiedService.additionChanges removeObjectsInArray:modifiedService.deletingChanges];
+    
+    for (NSNumber *idNumber in modifiedService.additionChanges) {
+        Task *task = [modifiedService getTaskWithID:idNumber.intValue];
+        [updatableService addTask:task];
+    }
+}
+
+- (void)synchronizeUpdatingFromService: (id<TaskServiceProtocol>) modifiedService withService: (id<TaskServiceProtocol>) updatableService {
+    
+    [modifiedService.updatingChanges removeObjectsInArray:modifiedService.deletingChanges];
+    
+    for (NSNumber *idNumber in modifiedService.updatingChanges) {
+        Task *task = [modifiedService getTaskWithID:idNumber.intValue];
+        [updatableService updateTask:task];
+    }
+}
+
+- (void)synchronizeDeletingFromService: (id<TaskServiceProtocol>) modifiedService withService: (id<TaskServiceProtocol>) updatableService {
+    for (NSNumber *idNumber in modifiedService.deletingChanges) {
+        [updatableService deleteTaskWithID:idNumber.intValue];
+    }
+}
+
 - (void)synchronizeWithPriority: (StoreType) priorityStore {
     
     self.sqliteService.isSavingChanges = NO;
     self.coreDataService.isSavingChanges = NO;
     
+    
     // Add Changes
     
-    [self.coreDataService.addChanges removeObjectsInArray:self.coreDataService.deleteChanges];
-    [self.sqliteService.addChanges removeObjectsInArray:self.sqliteService.deleteChanges];
+    [self.coreDataService.additionChanges removeObjectsInArray:self.coreDataService.deletingChanges];
+    [self.sqliteService.additionChanges removeObjectsInArray:self.sqliteService.deletingChanges];
     
-    for (NSNumber *idNumber in self.coreDataService.addChanges) {
-        Task *task = [self.coreDataService getTaskWithID:idNumber.intValue];
-        [self.sqliteService addTask:task];
-    }
-    
-    for (NSNumber *idNumber in self.sqliteService.addChanges) {
-        Task *task = [self.sqliteService getTaskWithID:idNumber.intValue];
-        [self.coreDataService addTask:task];
-    }
-    
-    if (priorityStore == StoreTypeSQLite) {
-        [self.coreDataService.updateChanges removeObjectsInArray:self.sqliteService.updateChanges];
-    } else if (priorityStore == StoreTypeCoreData) {
-        [self.sqliteService.updateChanges removeObjectsInArray:self.coreDataService.updateChanges];
-    }
+    [self synchronizeAdditionFromService:self.coreDataService withService:self.sqliteService];
+    [self synchronizeAdditionFromService:self.sqliteService withService:self.coreDataService];
     
     // Update changes
     
-    [self.coreDataService.updateChanges removeObjectsInArray:self.coreDataService.deleteChanges];
-    [self.sqliteService.updateChanges removeObjectsInArray:self.sqliteService.deleteChanges];
-    
-    for (NSNumber *idNumber in self.coreDataService.updateChanges) {
-        Task *task = [self.coreDataService getTaskWithID:idNumber.intValue];
-        [self.sqliteService updateTask:task];
+    // To resolve collisions
+    if (priorityStore == StoreTypeSQLite) {
+        [self.coreDataService.updatingChanges removeObjectsInArray:self.sqliteService.updatingChanges];
+    } else if (priorityStore == StoreTypeCoreData) {
+        [self.sqliteService.updatingChanges removeObjectsInArray:self.coreDataService.updatingChanges];
     }
     
-    for (NSNumber *idNumber in self.sqliteService.updateChanges) {
-        Task *task = [self.sqliteService getTaskWithID:idNumber.intValue];
-        [self.coreDataService updateTask:task];
-    }
+    [self synchronizeUpdatingFromService:self.coreDataService withService:self.sqliteService];
+    [self synchronizeUpdatingFromService:self.sqliteService withService:self.coreDataService];
     
     // Delete changes
     
-    for (NSNumber *idNumber in self.coreDataService.deleteChanges) {
-        [self.sqliteService deleteTaskWithID:idNumber.intValue];
-    }
+    [self synchronizeDeletingFromService:self.coreDataService withService:self.sqliteService];
+    [self synchronizeDeletingFromService:self.sqliteService withService:self.coreDataService];
     
-    for (NSNumber *idNumber in self.sqliteService.deleteChanges) {
-        [self.coreDataService deleteTaskWithID:idNumber.intValue];
-    }
+    // Finish
    
     [self.coreDataService cleanChanges];
     [self.sqliteService cleanChanges];
     
     self.sqliteService.isSavingChanges = YES;
     self.coreDataService.isSavingChanges = YES;
+    
+    [NSNotificationCenter.defaultCenter postNotificationName:storeDidUpdateNotification object:nil];
 }
 
 - (int)getMaxLastTaskID {
@@ -118,6 +128,13 @@ static TaskServiceProvider *sharedService = nil;
 - (void)clearStores {
     [self.coreDataService deleteAllTasks];
     [self.sqliteService deleteAllTasks];
+    
+    [NSNotificationCenter.defaultCenter postNotificationName:storeDidUpdateNotification object:nil];
+}
+
+- (void)setStoreType:(StoreType)storeType {
+    _storeType = storeType;
+    [NSNotificationCenter.defaultCenter postNotificationName:storeDidUpdateNotification object:nil];
 }
 
 @end

@@ -7,8 +7,6 @@
 //
 
 #import "SettingsViewController.h"
-#import "StoreType.h"
-
 #import "TaskServiceProvider.h"
 
 @interface SettingsViewController ()
@@ -46,10 +44,11 @@
         [TaskServiceProvider.sharedProvider setStoreType:StoreTypeCoreData];
         [userDefault setInteger:StoreTypeCoreData forKey:SettingsStoreType];
     }
+    
 }
 
 - (IBAction)deleteAll:(UIButton *)sender {
-    [[TaskServiceProvider.sharedProvider getCurrentService] deleteAllTasks];
+    [TaskServiceProvider.sharedProvider clearStores];
     
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Clearing completed" message:@"Clearing completed successfully" preferredStyle: UIAlertControllerStyleAlert];
     UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
@@ -61,7 +60,7 @@
 - (IBAction)synchronize:(UIButton *)sender {
     TaskServiceProvider *taskService = TaskServiceProvider.sharedProvider;
     
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Priority store" message:@"Choose priority store if there are the same updates" preferredStyle: UIAlertControllerStyleActionSheet];
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Choose priority store" message:@"Choose priority store if there are update collisions" preferredStyle: UIAlertControllerStyleActionSheet];
     
     UIAlertAction *cdAction = [UIAlertAction actionWithTitle:@"CoreData" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [taskService synchronizeWithPriority: StoreTypeCoreData];

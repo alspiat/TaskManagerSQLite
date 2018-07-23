@@ -11,9 +11,9 @@
 #import "AddTaskTableViewController.h"
 #import "Task.h"
 #import "TaskServiceProvider.h"
+#import "UIColor+ApplicationColors.h"
 #import "StoreType.h"
-
-static NSString * const taskCellIdentifier = @"TaskTableViewCell";
+#import "Constants.h"
 
 @interface TasksViewController () <UITableViewDataSource, UITableViewDelegate> {
     BOOL isSorted;
@@ -43,32 +43,27 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     self.currentStoreType = [userDefaults integerForKey:SettingsStoreType];
     
-    NSLog(@"Load storeType: %@", self.currentStoreType == StoreTypeCoreData ? @"StoreTypeCoreData" : @"StoreTypeSQLite");
-    
     [TaskServiceProvider.sharedProvider setStoreType:self.currentStoreType];
     self.taskService = [TaskServiceProvider.sharedProvider getCurrentService];
     
     [self.dataSource addObjectsFromArray:[self.taskService getAllTasks]];
     
     [self.tableView setTableFooterView:[[UIView alloc] initWithFrame:CGRectZero]];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateTableView) name:storeDidUpdateNotification object:nil];
+    
     
     // Do any additional setup after loading the view.
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
+- (void) updateTableView {
+    NSLog(@"Update");
+    self.currentStoreType = TaskServiceProvider.sharedProvider.storeType;
+    self.taskService = [TaskServiceProvider.sharedProvider getCurrentService];
     
-    if (TaskServiceProvider.sharedProvider.storeType != self.currentStoreType) {
-        NSLog(@"Update storeType to %@", TaskServiceProvider.sharedProvider.storeType == StoreTypeCoreData ? @"StoreTypeCoreData" : @"StoreTypeSQLite");
-        
-        self.currentStoreType = TaskServiceProvider.sharedProvider.storeType;
-        self.taskService = [TaskServiceProvider.sharedProvider getCurrentService];
-        
-        [self.dataSource removeAllObjects];
-        [self.dataSource addObjectsFromArray:[self.taskService getAllTasks]];
-        
-        [self.tableView reloadData];
-    }
+    [self.dataSource removeAllObjects];
+    [self.dataSource addObjectsFromArray:[self.taskService getAllTasks]];
+    
+    [self.tableView reloadData];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -117,7 +112,7 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
             [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
         } else {
             //NSLog(@"New task");
-            newTask.id = [self.taskService getLastTaskID] + 1;
+            newTask.id = [TaskServiceProvider.sharedProvider getMaxLastTaskID] + 1;
             [self.taskService addTask:newTask];
             [self.dataSource addObject:newTask];
             [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:(self.dataSource.count - 1) inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
@@ -162,7 +157,7 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
         completionHandler(YES);
     }];
     
-    //delete.backgroundColor = [self.colorService colorForDeleteRowAction];
+    delete.backgroundColor = [UIColor appDeleteRowActionColor];
     delete.image = [UIImage imageNamed: @"delete"];
     
     return [UISwipeActionsConfiguration configurationWithActions:@[delete]];
@@ -194,7 +189,7 @@ static NSString * const taskCellIdentifier = @"TaskTableViewCell";
         completionHandler(YES);
     }];
     
-    selectAsDone.backgroundColor = [UIColor colorWithRed:36.0/255.0 green:110.0/255.0 blue:95.0/255.0 alpha:1];
+    selectAsDone.backgroundColor = [UIColor appDoneRowActionColor];
     selectAsDone.image = [UIImage imageNamed: imageName];
     
     return [UISwipeActionsConfiguration configurationWithActions:@[selectAsDone]];

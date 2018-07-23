@@ -8,6 +8,10 @@
 
 #import "TaskTableViewCell.h"
 #import "Task.h"
+#import "UIColor+ApplicationColors.h"
+#import "Constants.h"
+
+NSString * const taskCellIdentifier = @"TaskTableViewCellIdentifier";
 
 @interface TaskTableViewCell()
 
@@ -36,11 +40,11 @@
 
 - (void)configureCellWithTask:(Task *)task {
     UIView *customColorView = [[UIView alloc] init];
-    customColorView.backgroundColor = [UIColor colorWithRed:82.0/255.0 green:89.0/255.0 blue:107.0/255.0 alpha:1.0];
+    customColorView.backgroundColor = [UIColor appSelectedCellColor];
     self.selectedBackgroundView = customColorView;
     
     self.iconImageView.image = [UIImage imageNamed:task.iconName];
-    [self.iconImageView.layer setCornerRadius:self.iconImageView.bounds.size.height * 0.5];
+    [self.iconImageView.layer setCornerRadius:self.iconImageView.bounds.size.height * iconCornerRadiusFactor];
     self.iconImageView.layer.masksToBounds = YES;
     
     self.titleLabel.text = task.title;
@@ -50,13 +54,13 @@
                                                           toDate:task.expirationDate
                                                          options:0];
     if (task.isDone) {
-        [self.iconImageView.layer setBorderWidth:3.0];
-        [self.iconImageView.layer setBorderColor:[UIColor colorWithRed:37.0/255.0 green:225.0/255.0 blue:175.0/255.0 alpha:1].CGColor];
+        [self.iconImageView.layer setBorderWidth:iconBorderWidth];
+        [self.iconImageView.layer setBorderColor:[UIColor appTaskIsDoneBorderColor].CGColor];
     } else if (components.day < 7) {
-        [self.iconImageView.layer setBorderWidth:3.0];
-        [self.iconImageView.layer setBorderColor:[UIColor colorWithRed:249.0/255.0 green:83.0/255.0 blue:87.0/255.0 alpha:1].CGColor];
+        [self.iconImageView.layer setBorderWidth:iconBorderWidth];
+        [self.iconImageView.layer setBorderColor:[UIColor appTaskIsPriorityBorderColor].CGColor];
     } else {
-        [self.iconImageView.layer setBorderWidth:0];
+        [self.iconImageView.layer setBorderWidth:iconBorderWidthZero];
     }
     
 }

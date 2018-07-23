@@ -7,6 +7,10 @@
 //
 
 #import "IconCollectionViewCell.h"
+#import "UIColor+ApplicationColors.h"
+#import "Constants.h"
+
+NSString * const iconCellIdentfier = @"IconCollectionViewCellIdentifier";
 
 @interface IconCollectionViewCell()
 
@@ -17,8 +21,8 @@
 @implementation IconCollectionViewCell
 
 - (void)configureWithImage:(UIImage *)image {
-    [self.iconImageView.layer setCornerRadius:self.bounds.size.height * 0.5];
-    [self.iconImageView.layer setBorderColor:[UIColor colorWithRed:102.0/255.0 green:106.0/255.0 blue:118.0/255.0 alpha:1].CGColor];
+    [self.iconImageView.layer setCornerRadius:self.bounds.size.height * iconCornerRadiusFactor];
+    [self.iconImageView.layer setBorderColor:[UIColor appIconIsSelectedBorderColor].CGColor];
     self.iconImageView.layer.masksToBounds = YES;
     self.iconImageView.image = image;
 }

@@ -11,8 +11,13 @@
 #import "AppDelegate.h"
 #import "ManagedTask+CoreDataClass.h"
 
+static NSString * const cdAddionChangesKey = @"CoreDataAdditionChanges";
+static NSString * const cdUpdatingChangesKey = @"CoreDataUpdatingChanges";
+static NSString * const cdDeletingChangesKey = @"CoreDataDeletingChanges";
+
 @interface TaskServiceCoreData()
 
+@property (strong, nonatomic) AppDelegate *appDelegate;
 @property (strong, nonatomic) NSManagedObjectContext *context;
 @property (strong, nonatomic) NSUserDefaults *userDefaults;
 
@@ -24,7 +29,8 @@
 {
     self = [super init];
     if (self) {
-        _context = ((AppDelegate *)UIApplication.sharedApplication.delegate).persistentContainer.viewContext;
+        _appDelegate = ((AppDelegate *)UIApplication.sharedApplication.delegate);
+        _context = self.appDelegate.persistentContainer.viewContext;
         _userDefaults = NSUserDefaults.standardUserDefaults;
         
         [self initChanges];
@@ -35,19 +41,19 @@
 - (void)initChanges {
     _isSavingChanges = YES;
     
-    _addChanges = [[NSMutableArray alloc] initWithArray:[self.userDefaults arrayForKey:cdAddChangesKey]];
-    _deleteChanges = [[NSMutableArray alloc] initWithArray:[self.userDefaults arrayForKey:cdDeleteChangesKey]];
-    _updateChanges = [[NSMutableArray alloc] initWithArray:[self.userDefaults arrayForKey:cdUpdateChangesKey]];
+    _additionChanges = [[NSMutableArray alloc] initWithArray:[self.userDefaults arrayForKey:cdAddionChangesKey]];
+    _deletingChanges = [[NSMutableArray alloc] initWithArray:[self.userDefaults arrayForKey:cdDeletingChangesKey]];
+    _updatingChanges = [[NSMutableArray alloc] initWithArray:[self.userDefaults arrayForKey:cdUpdatingChangesKey]];
 }
 
 - (void)cleanChanges {
-    [self.addChanges removeAllObjects];
-    [self.deleteChanges removeAllObjects];
-    [self.updateChanges removeAllObjects];
+    [self.additionChanges removeAllObjects];
+    [self.deletingChanges removeAllObjects];
+    [self.updatingChanges removeAllObjects];
     
-    [self.userDefaults setObject:self.addChanges forKey:cdAddChangesKey];
-    [self.userDefaults setObject:self.deleteChanges forKey:cdDeleteChangesKey];
-    [self.userDefaults setObject:self.updateChanges forKey:cdUpdateChangesKey];
+    [self.userDefaults setObject:self.additionChanges forKey:cdAddionChangesKey];
+    [self.userDefaults setObject:self.deletingChanges forKey:cdDeletingChangesKey];
+    [self.userDefaults setObject:self.updatingChanges forKey:cdUpdatingChangesKey];
 }
 
 - (NSMutableArray<Task *> *)getAllTasks {
@@ -101,11 +107,11 @@
     managedTask.isDone = task.isDone;
     managedTask.expirationDate = task.expirationDate;
     
-    [self.context save:nil];
+    [self.appDelegate saveContext];
     
     if (self.isSavingChanges) {
-        [self.addChanges addObject:[NSNumber numberWithInt:task.id]];
-        [self.userDefaults setObject:self.addChanges forKey:cdAddChangesKey];
+        [self.additionChanges addObject:[NSNumber numberWithInt:task.id]];
+        [self.userDefaults setObject:self.additionChanges forKey:cdAddionChangesKey];
     }
 }
 
@@ -126,11 +132,11 @@
     managedTaskArray.firstObject.isDone = task.isDone;
     managedTaskArray.firstObject.expirationDate = task.expirationDate;
     
-    [self.context save:nil];
+    [self.appDelegate saveContext];
     
     if (self.isSavingChanges) {
-        [self.updateChanges addObject:[NSNumber numberWithInt:task.id]];
-        [self.userDefaults setObject:self.updateChanges forKey:cdUpdateChangesKey];
+        [self.updatingChanges addObject:[NSNumber numberWithInt:task.id]];
+        [self.userDefaults setObject:self.updatingChanges forKey:cdUpdatingChangesKey];
     }
 }
 
@@ -142,7 +148,7 @@
         [self.context deleteObject:managedTask];
     }
     
-    [self.context save:nil];
+    [self.appDelegate saveContext];
     
     [self cleanChanges];
 }
@@ -162,11 +168,11 @@
     }
     
     [self.context deleteObject:managedTaskArray.firstObject];
-    [self.context save:nil];
+    [self.appDelegate saveContext];
     
     if (self.isSavingChanges) {
-        [self.deleteChanges addObject:[NSNumber numberWithInt:id]];
-        [self.userDefaults setObject:self.deleteChanges forKey:cdDeleteChangesKey];
+        [self.deletingChanges addObject:[NSNumber numberWithInt:id]];
+        [self.userDefaults setObject:self.deletingChanges forKey:cdDeletingChangesKey];
     }
 }
 

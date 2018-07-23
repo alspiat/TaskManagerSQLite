@@ -9,20 +9,14 @@
 #import <Foundation/Foundation.h>
 #import "TaskServiceProtocol.h"
 
-static NSString * const cdAddChangesKey = @"CoreDataAddChanges";
-static NSString * const cdUpdateChangesKey = @"CoreDataUpdateChanges";
-static NSString * const cdDeleteChangesKey = @"CoreDataDeleteChanges";
-
 @interface TaskServiceCoreData : NSObject <TaskServiceProtocol>
 
 @property (assign, nonatomic) BOOL isSavingChanges;
 
-@property (strong, nonatomic) NSMutableArray *addChanges;
-@property (strong, nonatomic) NSMutableArray *updateChanges;
-@property (strong, nonatomic) NSMutableArray *deleteChanges;
+@property (strong, nonatomic) NSMutableArray *additionChanges;
+@property (strong, nonatomic) NSMutableArray *updatingChanges;
+@property (strong, nonatomic) NSMutableArray *deletingChanges;
 
-- (Task *)getTaskWithID: (int) id;
-- (void)deleteTaskWithID: (int) id;
 - (void)cleanChanges;
 
 @end

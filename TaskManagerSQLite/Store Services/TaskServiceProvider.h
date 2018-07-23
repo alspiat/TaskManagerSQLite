@@ -9,6 +9,8 @@
 #import "TaskServiceProtocol.h"
 #import "StoreType.h"
 
+static NSString * const storeDidUpdateNotification = @"StoreDidUpdateNotification";
+
 @interface TaskServiceProvider : NSObject
 
 @property (assign, nonatomic) StoreType storeType;

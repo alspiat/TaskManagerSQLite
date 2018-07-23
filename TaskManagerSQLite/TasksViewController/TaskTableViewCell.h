@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+extern NSString * const taskCellIdentifier;
+
 @class Task;
 
 @interface TaskTableViewCell : UITableViewCell

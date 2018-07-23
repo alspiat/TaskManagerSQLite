@@ -12,9 +12,14 @@
 
 @protocol TaskServiceProtocol <NSObject>
 
+@property (strong, nonatomic) NSMutableArray *additionChanges;
+@property (strong, nonatomic) NSMutableArray *updatingChanges;
+@property (strong, nonatomic) NSMutableArray *deletingChanges;
+
 @required
 
 - (NSMutableArray<Task *> *)getAllTasks;
+- (Task *)getTaskWithID: (int) id;
 - (int)getLastTaskID;
 
 - (void)addTask: (Task*) task;
@@ -22,6 +27,7 @@
 
 - (void)deleteTask: (Task*) task;
 - (void)deleteAllTasks;
+- (void)deleteTaskWithID: (int) id;
 
 @end
 

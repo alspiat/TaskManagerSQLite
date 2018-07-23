@@ -114,11 +114,11 @@
             <objects>
                 <viewController id="76U-9b-iYJ" customClass="SettingsViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="bxk-oO-kaQ">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="554"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NLp-Zy-rec">
-                                <rect key="frame" x="197.5" y="123" width="157.5" height="35"/>
+                                <rect key="frame" x="197.5" y="143" width="157.5" height="35"/>
                                 <color key="backgroundColor" red="0.1803921568627451" green="0.19607843137254902" blue="0.24313725490196078" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="35" id="9mQ-HM-XeV"/>
@@ -131,7 +131,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PKi-iS-Oqy">
-                                <rect key="frame" x="20" y="123" width="157.5" height="35"/>
+                                <rect key="frame" x="20" y="143" width="157.5" height="35"/>
                                 <color key="backgroundColor" red="0.1803921568627451" green="0.19607843137254902" blue="0.24313725490196078" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <state key="normal" title="Clear stores">
                                     <color key="titleColor" red="0.92143100499999997" green="0.92145264149999995" blue="0.92144101860000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -141,13 +141,13 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Store type" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KqQ-aN-8hb">
-                                <rect key="frame" x="20" y="32" width="79.5" height="21"/>
+                                <rect key="frame" x="20" y="52" width="79.5" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" red="0.92143100499999997" green="0.92145264149999995" blue="0.92144101860000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="C4o-QN-C87">
-                                <rect key="frame" x="20" y="63" width="335" height="36"/>
+                                <rect key="frame" x="20" y="83" width="335" height="36"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="35" id="c54-5k-A9d"/>
                                 </constraints>
@@ -447,40 +447,14 @@
                     </tabBar>
                     <connections>
                         <segue destination="9Pb-Hz-MSm" kind="relationship" relationship="viewControllers" id="5Or-P5-c3j"/>
-                        <segue destination="mdQ-gA-MSr" kind="relationship" relationship="viewControllers" id="bSa-v8-nCC"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="06d-qA-WYC" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1903" y="-64"/>
         </scene>
-        <!--Settings-->
-        <scene sceneID="fuu-8P-i0h">
-            <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="sWa-g9-SfW" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="mdQ-gA-MSr" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Settings" image="settings" id="z8D-LJ-don"/>
-                    <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="k67-m2-AGi">
-                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <color key="barTintColor" red="0.1803921568627451" green="0.19607843137254902" blue="0.24313725490196078" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <textAttributes key="titleTextAttributes">
-                            <fontDescription key="fontDescription" name="AppleSDGothicNeo-Regular" family="Apple SD Gothic Neo" pointSize="19"/>
-                            <color key="textColor" red="0.92143100499999997" green="0.92145264149999995" blue="0.92144101860000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        </textAttributes>
-                    </navigationBar>
-                    <nil name="viewControllers"/>
-                    <connections>
-                        <segue destination="76U-9b-iYJ" kind="relationship" relationship="rootViewController" id="hVN-rj-BmF"/>
-                    </connections>
-                </navigationController>
-            </objects>
-            <point key="canvasLocation" x="-1151" y="707"/>
-        </scene>
     </scenes>
     <resources>
         <image name="list" width="27" height="27"/>
-        <image name="settings" width="27" height="27"/>
     </resources>
 </document>

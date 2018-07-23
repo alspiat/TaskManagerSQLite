@@ -9,8 +9,7 @@
 #import "AddTaskTableViewController.h"
 #import "IconCollectionViewCell.h"
 #import "Task.h"
-
-static NSString * const iconCollectionViewCell = @"IconCollectionViewCell";
+#import "UIColor+ApplicationColors.h"
 
 @interface AddTaskTableViewController () <UICollectionViewDataSource, UICollectionViewDelegate> {
     NSIndexPath *selectedIconIndex;
@@ -38,7 +37,7 @@ static NSString * const iconCollectionViewCell = @"IconCollectionViewCell";
     self.iconsCollectionView.dataSource = self;
     self.iconsCollectionView.delegate = self;
     
-    [self.datePicker setValue:[UIColor colorWithRed:183.0/255.0 green:189.0/255.0 blue:201.0/255.0 alpha:1.0] forKey:@"textColor"];
+    [self.datePicker setValue:[UIColor appDatePickerTextColor] forKey:@"textColor"];
     
     if (self.task != nil) {
         self.titleTextField.text = self.task.title;
@@ -90,7 +89,7 @@ static NSString * const iconCollectionViewCell = @"IconCollectionViewCell";
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    IconCollectionViewCell *iconCell = [collectionView dequeueReusableCellWithReuseIdentifier:iconCollectionViewCell forIndexPath:indexPath];
+    IconCollectionViewCell *iconCell = [collectionView dequeueReusableCellWithReuseIdentifier:iconCellIdentfier forIndexPath:indexPath];
     
     [iconCell configureWithImage:[UIImage imageNamed:self.icons[indexPath.row]]];
     [iconCell setIsSelected: (indexPath == selectedIconIndex)];

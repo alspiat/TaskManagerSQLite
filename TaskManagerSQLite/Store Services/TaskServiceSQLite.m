@@ -10,6 +10,10 @@
 #import "SQLiteManager.h"
 #import "Task.h"
 
+static NSString * const slAdditionChangesKey = @"SQLiteAdditionChanges";
+static NSString * const slUpdatingChangesKey = @"SQLiteUpdatingChanges";
+static NSString * const slDeletingChangesKey = @"SQLiteDeletingChanges";
+
 @interface TaskServiceSQLite ()
 
 @property (strong, nonatomic) NSUserDefaults *userDefaults;
@@ -31,19 +35,19 @@
     _isSavingChanges = YES;
     _userDefaults = NSUserDefaults.standardUserDefaults;
     
-    _addChanges = [[NSMutableArray alloc] initWithArray:[self.userDefaults arrayForKey:slAddChangesKey]];
-    _deleteChanges = [[NSMutableArray alloc] initWithArray:[self.userDefaults arrayForKey:slDeleteChangesKey]];
-    _updateChanges = [[NSMutableArray alloc] initWithArray:[self.userDefaults arrayForKey:slUpdateChangesKey]];
+    _additionChanges = [[NSMutableArray alloc] initWithArray:[self.userDefaults arrayForKey:slAdditionChangesKey]];
+    _deletingChanges = [[NSMutableArray alloc] initWithArray:[self.userDefaults arrayForKey:slDeletingChangesKey]];
+    _updatingChanges = [[NSMutableArray alloc] initWithArray:[self.userDefaults arrayForKey:slUpdatingChangesKey]];
 }
 
 - (void)cleanChanges {
-    [self.addChanges removeAllObjects];
-    [self.deleteChanges removeAllObjects];
-    [self.updateChanges removeAllObjects];
+    [self.additionChanges removeAllObjects];
+    [self.deletingChanges removeAllObjects];
+    [self.updatingChanges removeAllObjects];
     
-    [self.userDefaults setObject:self.addChanges forKey:slAddChangesKey];
-    [self.userDefaults setObject:self.deleteChanges forKey:slDeleteChangesKey];
-    [self.userDefaults setObject:self.updateChanges forKey:slUpdateChangesKey];
+    [self.userDefaults setObject:self.additionChanges forKey:slAdditionChangesKey];
+    [self.userDefaults setObject:self.deletingChanges forKey:slDeletingChangesKey];
+    [self.userDefaults setObject:self.updatingChanges forKey:slUpdatingChangesKey];
 }
 
 - (NSMutableArray<Task*> *)getAllTasks {
@@ -88,13 +92,14 @@
 }
 
 - (void)addTask: (Task*) task {
-    NSString *sql = [NSString stringWithFormat:@"INSERT INTO task (id, title, details, iconName, expirationDate, isDone) VALUES ('%d', '%@', '%@', '%@', %f, %d)", task.id, task.title, task.details, task.iconName, task.expirationDate.timeIntervalSince1970, task.isDone ? 1 : 0];
+    NSString *sql = [NSString stringWithFormat:@"INSERT INTO task (id, title, details, iconName, expirationDate, isDone) VALUES ('%d', '%@', '%@', '%@', %f, %d)", task.id, task.title, task.details, task.iconName, task.expirationDate.timeIntervalSince1970, task.isDone];
     
+    NSLog(@"ADD TASK SQL: %@", sql);
     [SQLiteManager.sharedManager insertRow:sql];
     
     if (self.isSavingChanges) {
-        [self.addChanges addObject:[NSNumber numberWithInt:task.id]];
-        [self.userDefaults setObject:self.addChanges forKey:slAddChangesKey];
+        [self.additionChanges addObject:[NSNumber numberWithInt:task.id]];
+        [self.userDefaults setObject:self.additionChanges forKey:slAdditionChangesKey];
     }
 }
 
@@ -107,18 +112,18 @@
     [SQLiteManager.sharedManager deleteRow:sql];
     
     if (self.isSavingChanges) {
-        [self.deleteChanges addObject:[NSNumber numberWithInt:id]];
-        [self.userDefaults setObject:self.deleteChanges forKey:slDeleteChangesKey];
+        [self.deletingChanges addObject:[NSNumber numberWithInt:id]];
+        [self.userDefaults setObject:self.deletingChanges forKey:slDeletingChangesKey];
     }
 }
 
 - (void)updateTask: (Task*) task {
-    NSString *sql = [NSString stringWithFormat:@"UPDATE task SET title = '%@', details = '%@', iconName = '%@', expirationDate = %f, isDone = %d WHERE id = %d", task.title, task.details, task.iconName, task.expirationDate.timeIntervalSince1970, task.isDone ? 1 : 0, task.id];
+    NSString *sql = [NSString stringWithFormat:@"UPDATE task SET title = '%@', details = '%@', iconName = '%@', expirationDate = %f, isDone = %d WHERE id = %d", task.title, task.details, task.iconName, task.expirationDate.timeIntervalSince1970, task.isDone, task.id];
     [SQLiteManager.sharedManager updateRow:sql];
     
     if (self.isSavingChanges) {
-        [self.updateChanges addObject:[NSNumber numberWithInt:task.id]];
-        [self.userDefaults setObject:self.updateChanges forKey:slUpdateChangesKey];
+        [self.updatingChanges addObject:[NSNumber numberWithInt:task.id]];
+        [self.userDefaults setObject:self.updatingChanges forKey:slUpdatingChangesKey];
     }
 }
 

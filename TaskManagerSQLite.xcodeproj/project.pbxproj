@@ -13,6 +13,7 @@
 		9A10FE3F20FE124400F6F855 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A10FE3E20FE124400F6F855 /* SettingsViewController.m */; };
 		9A1D867C20FE578000DB43B1 /* ManagedTask+CoreDataClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1D867A20FE578000DB43B1 /* ManagedTask+CoreDataClass.m */; };
 		9A1D867D20FE578000DB43B1 /* ManagedTask+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1D867B20FE578000DB43B1 /* ManagedTask+CoreDataProperties.m */; };
+		9A84CA64210224C500C909AC /* UIColor+ApplicationColors.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A84CA63210224C500C909AC /* UIColor+ApplicationColors.m */; };
 		9A89C36A2100A17600F9A475 /* TaskServiceProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A89C3692100A17600F9A475 /* TaskServiceProvider.m */; };
 		AA0CE69A20F746B8003A8FEB /* TaskServiceSQLite.m in Sources */ = {isa = PBXBuildFile; fileRef = AA0CE69920F746B8003A8FEB /* TaskServiceSQLite.m */; };
 		AA1F2BDB20F36EE900D486ED /* IconCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = AA1F2BDA20F36EE900D486ED /* IconCollectionViewCell.m */; };
@@ -36,7 +37,6 @@
 		9A10FE3B20FE0CC700F6F855 /* TaskServiceCoreData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TaskServiceCoreData.m; sourceTree = "<group>"; };
 		9A10FE3D20FE124400F6F855 /* SettingsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
 		9A10FE3E20FE124400F6F855 /* SettingsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
-		9A10FE4220FE15B100F6F855 /* StoreType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StoreType.h; sourceTree = "<group>"; };
 		9A1D867820FE578000DB43B1 /* ManagedTask+CoreDataProperties.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ManagedTask+CoreDataProperties.h"; sourceTree = "<group>"; };
 		9A1D867920FE578000DB43B1 /* ManagedTask+CoreDataClass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ManagedTask+CoreDataClass.h"; sourceTree = "<group>"; };
 		9A1D867A20FE578000DB43B1 /* ManagedTask+CoreDataClass.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "ManagedTask+CoreDataClass.m"; sourceTree = "<group>"; };
@@ -44,7 +44,11 @@
 		9A74ECF720FE33EF00D34102 /* TaskServiceProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TaskServiceProtocol.h; sourceTree = "<group>"; };
 		9A74ECF820FE34D200D34102 /* TaskServiceSQLite.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TaskServiceSQLite.h; sourceTree = "<group>"; };
 		9A74ECF920FE357800D34102 /* TaskServiceCoreData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TaskServiceCoreData.h; sourceTree = "<group>"; };
+		9A78BD542105BB9600D339DD /* StoreType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StoreType.h; sourceTree = "<group>"; };
+		9A78BD552105BC2000D339DD /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 		9A84CA6121020E0400C909AC /* TaskServiceProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TaskServiceProvider.h; sourceTree = "<group>"; };
+		9A84CA62210224C500C909AC /* UIColor+ApplicationColors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIColor+ApplicationColors.h"; sourceTree = "<group>"; };
+		9A84CA63210224C500C909AC /* UIColor+ApplicationColors.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIColor+ApplicationColors.m"; sourceTree = "<group>"; };
 		9A89C3692100A17600F9A475 /* TaskServiceProvider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TaskServiceProvider.m; sourceTree = "<group>"; };
 		AA0CE69920F746B8003A8FEB /* TaskServiceSQLite.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TaskServiceSQLite.m; sourceTree = "<group>"; };
 		AA1F2BD920F36EE900D486ED /* IconCollectionViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IconCollectionViewCell.h; sourceTree = "<group>"; };
@@ -122,7 +126,6 @@
 				AA0CE69920F746B8003A8FEB /* TaskServiceSQLite.m */,
 				9A84CA6121020E0400C909AC /* TaskServiceProvider.h */,
 				9A89C3692100A17600F9A475 /* TaskServiceProvider.m */,
-				9A10FE4220FE15B100F6F855 /* StoreType.h */,
 				9A89C36421008C7700F9A475 /* Database */,
 			);
 			path = "Store Services";
@@ -182,6 +185,10 @@
 				AA932BC720F2A48200864C80 /* LaunchScreen.storyboard */,
 				AA932BCA20F2A48200864C80 /* Info.plist */,
 				9A10FE4020FE125500F6F855 /* SettingsViewController */,
+				9A84CA62210224C500C909AC /* UIColor+ApplicationColors.h */,
+				9A84CA63210224C500C909AC /* UIColor+ApplicationColors.m */,
+				9A78BD542105BB9600D339DD /* StoreType.h */,
+				9A78BD552105BC2000D339DD /* Constants.h */,
 			);
 			path = TaskManagerSQLite;
 			sourceTree = "<group>";
@@ -269,6 +276,7 @@
 				AAE6635D20F34805001F521C /* TasksViewController.m in Sources */,
 				AAE6636120F348C5001F521C /* TaskTableViewCell.m in Sources */,
 				9A10FE3F20FE124400F6F855 /* SettingsViewController.m in Sources */,
+				9A84CA64210224C500C909AC /* UIColor+ApplicationColors.m in Sources */,
 				AA1F2BDB20F36EE900D486ED /* IconCollectionViewCell.m in Sources */,
 				9A10FE2A20FDF75E00F6F855 /* TasksModel.xcdatamodeld in Sources */,
 				9A10FE3C20FE0CC700F6F855 /* TaskServiceCoreData.m in Sources */,

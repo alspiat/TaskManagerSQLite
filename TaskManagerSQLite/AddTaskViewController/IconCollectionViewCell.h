@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+extern NSString * const iconCellIdentfier;
+
 @interface IconCollectionViewCell : UICollectionViewCell
 
 - (void) configureWithImage: (UIImage*) image;
